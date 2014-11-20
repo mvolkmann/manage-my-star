@@ -3,10 +3,15 @@
     <th>Artist</th>
     <th>Title</th>
     <th>Rating</th>
+    <th>Actions</th>
   </tr>
   <tr ng-repeat="(id, obj) in music">
     <td>{{obj.artist}}</td>
     <td>{{obj.title}}</td>
     <td>{{obj.rating}}</td>
+    <td>
+      <button class="btn btn-default" ng-click="deleteAlbum(id)">Delete</button>
+      <button class="btn btn-default">Edit</button>
+    </td>
   </tr>
 </table>

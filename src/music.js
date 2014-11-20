@@ -18,13 +18,25 @@
 
   app.factory('musicSvc', ['$http', $http => {
     return {
+      deleteAlbum(id) {
+        return $http.delete('/album/' + id);
+      },
       getMusic() {
         return $http.get('/album');
       }
     };
   }]);
 
-  app.controller('ManageCtrl', ['$scope', 'music', ($scope, music) => {
-    $scope.music = music.data;
+  app.controller('ManageCtrl', ['$scope', 'music', 'musicSvc',
+    ($scope, music, musicSvc) => {
+
+    music = music.data;
+    $scope.music = music;
+
+    $scope.deleteAlbum = id => {
+      const msg = 'Are you sure you want to delete the album "' +
+        music[id].title + '"?';
+      if (confirm(msg)) musicSvc.deleteAlbum(id);
+    };
   }]);
 })();
