@@ -1,1 +1,12 @@
-{"1":{"artist":"Jessica Hoop","title":"Kismet","rating":3},"2":{"artist":"Joanna Newsom","title":"Have One On Me","rating":4}}
+{
+  "1": {
+    "artist": "Jessica Hoop",
+    "title": "Kismet",
+    "rating": 3
+  },
+  "2": {
+    "artist": "Joanna Newsom",
+    "title": "Have One On Me",
+    "rating": 4
+  }
+}

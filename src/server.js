@@ -28,7 +28,8 @@ function getHighestId(music) {
 }
 
 function saveCds(music, cb) {
-  fs.writeFile(filePath, JSON.stringify(music), cb);
+  let json = JSON.stringify(music, null, 2);
+  fs.writeFile(filePath, json, cb);
 }
 
 app['delete']('/album/:id', (req, res) => {
@@ -40,7 +41,6 @@ app['delete']('/album/:id', (req, res) => {
 
     saveCds(music, err => {
       if (err) return res.status(500).end(err);
-
       res.end();
     });
   });
@@ -68,8 +68,11 @@ app.post('/album', (req, res) => {
 
     const album = req.body;
     album.id = Number(getHighestId(music)) + 1;
-    console.log('server.js post: album =', album);
-    res.end('/album/' + album.id);
+    music[album.id] = album;
+    saveCds(music, err => {
+      if (err) return res.status(500).end(err);
+      res.end('/album/' + album.id);
+    });
   });
 });
 
