@@ -31,24 +31,25 @@ gulp.task('clean', function (done) {
 });
 
 gulp.task('csslint', function () {
+  var options = {
+    'box-model': false,
+    'box-sizing': false,
+    ids: false,
+    important: false,
+    'overqualified-elements': false,
+    'regex-selectors': false,
+    'qualified-headings': false,
+    'unique-headings': false,
+    'universal-selector': false,
+    'unqualified-attributes': false
+  };
+
   return gulp.src(paths.css).
     pipe(cache('csslint')).
-    pipe(csslint({
-      'box-model': false,
-      'box-sizing': false,
-      ids: false,
-      important: false,
-      'overqualified-elements': false,
-      'regex-selectors': false,
-      'qualified-headings': false,
-      'unique-headings': false,
-      'universal-selector': false,
-      'unqualified-attributes': false
-    })).
+    //pipe(csslint(options)).
+    pipe(csslint()).
     pipe(csslint.reporter());
 });
-
-gulp.task('default', ['watch']);
 
 gulp.task('js', ['jshint'], function (done) {
   //TODO: Don't call this if jshint found any issues.
@@ -109,3 +110,5 @@ gulp.task('watch', function () {
   gulp.watch([paths.css, paths.html, paths.json],
     livereload.changed);
 });
+
+gulp.task('default', ['less', 'transpile', 'watch']);
