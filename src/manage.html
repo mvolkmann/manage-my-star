@@ -1,3 +1,21 @@
+<form name="myForm">
+  <div class="row" ng-repeat="field in fields">
+    <label>{{field.label}}</label>
+    <input class="form-control" type="text" ng-model="field.value" required>
+  </div>
+</form>
+
+<div class="row">
+  <label></label>
+  <button class="btn btn-default" ng-click="addAlbum()"
+    ng-disabled="myForm.$invalid">
+    Add
+  </button>
+  <button class="btn btn-default" ng-click="notImplemented()">
+    Edit
+  </button>
+</div>
+
 <table>
   <tr>
     <th>Artist</th>

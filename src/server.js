@@ -12,7 +12,6 @@ const rootDir = __dirname + '/..';
 app.use(express.static(rootDir));
 
 const filePath = rootDir + '/music.json';
-console.log('filePath =', filePath);
 
 function getCds(cb) {
   fs.readFile(filePath, {encoding: 'utf8'}, (err, data) => {
@@ -24,7 +23,8 @@ function getCds(cb) {
 
 function getHighestId(music) {
   return Object.keys(music).reduce(
-    (highest, album) => Math.max(highest, Number(album.id)));
+    (highest, id) => Math.max(highest, Number(id)),
+    0);
 }
 
 function saveCds(music, cb) {
@@ -67,9 +67,21 @@ app.post('/album', (req, res) => {
     if (err) return res.status(500).end(err);
 
     const album = req.body;
-    album.id = getHighestId(music) + 1;
+    album.id = Number(getHighestId(music)) + 1;
+    console.log('server.js post: album =', album);
     res.end('/album/' + album.id);
   });
+});
+
+app.get('/field', (req, res) => {
+  const fields = [
+    {label: 'Artist', property: 'artist'},
+    {label: 'Title', property: 'title'},
+    {label: 'Rating', property: 'rating'}
+  ];
+
+  res.set('Content-Type', 'application/json');
+  res.end(JSON.stringify(fields));
 });
 
 const PORT = 3000;
