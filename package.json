@@ -11,7 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.9.2",
-    "express": "^4.10.2"
+    "express": "^4.10.2",
+    "gulp-nodemon": "^1.0.4"
   },
   "devDependencies": {
     "del": "^0.1.3",

@@ -1,4 +1,5 @@
 @label-width: 70px;
+@table-width: 600px; // 100%;
 
 body {
   font-family: sans-serif;
@@ -21,13 +22,31 @@ div.row {
 }
 
 table {
-  margin-top: 10px;
+  border-left: solid gray 1px;
+  border-top: solid gray 1px;
   border-collapse: collapse;
 }
 
+.manage-table-head {
+  display: block;
+  margin-top: 10px;
+  overflow: hidden;
+  width: @table-width;
+}
+
+.manage-table-body {
+  display: block;
+  overflow: scroll;
+  position: relative; //absolute;
+  width: @table-width;
+  height: 200px;
+}
+
 td, th {
-  border: solid gray 1px;
+  border-bottom: solid gray 1px;
+  border-right: solid gray 1px;
   padding: 10px;
+  min-width: 200px;
 }
 
 th {

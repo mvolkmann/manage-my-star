@@ -16,20 +16,36 @@
   </button>
 </div>
 
-<table>
-  <tr>
-    <th>Artist</th>
-    <th>Title</th>
-    <th>Rating</th>
-    <th>Actions</th>
-  </tr>
-  <tr ng-repeat="(id, obj) in music">
-    <td>{{obj.artist}}</td>
-    <td>{{obj.title}}</td>
-    <td>{{obj.rating}}</td>
-    <td>
-      <button class="btn btn-default" ng-click="deleteAlbum(id)">Delete</button>
-      <button class="btn btn-default">Edit</button>
-    </td>
-  </tr>
+<table class="manage-table-head">
+  <thead>
+    <tr>
+      <th ng-repeat="field in fields">
+        <a ng-click="sortOn(field)">
+          {{field.label}}
+        </a>
+        <span ng-show="sortField === field && !reverse"
+          ng-click="sortOn(field)">
+          &#x25b2;
+        </span>
+        <span ng-show="sortField === field && reverse"
+          ng-click="sortOn(field)">
+          &#x25bc;
+        </span>
+      </th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+</table>
+<table class="manage-table-body">
+  <tbody>
+    <tr ng-repeat="album in albums">
+      <td>{{album.artist}}</td>
+      <td>{{album.title}}</td>
+      <td>{{album.rating}}</td>
+      <td>
+        <button class="btn btn-default" ng-click="deleteAlbum(id)">Delete</button>
+        <button class="btn btn-default">Edit</button>
+      </td>
+    </tr>
+  </tbody>
 </table>

@@ -13,18 +13,18 @@ app.use(express.static(rootDir));
 
 const filePath = rootDir + '/music.json';
 
-function getCds(cb) {
+function getHighestId(music) {
+  return Object.keys(music).reduce(
+    (highest, id) => Math.max(highest, Number(id)),
+    0);
+}
+
+function getMusic(cb) {
   fs.readFile(filePath, {encoding: 'utf8'}, (err, data) => {
     if (err) return cb(err);
 
     cb(null, JSON.parse(data));
   });
-}
-
-function getHighestId(music) {
-  return Object.keys(music).reduce(
-    (highest, id) => Math.max(highest, Number(id)),
-    0);
 }
 
 function saveCds(music, cb) {
@@ -33,7 +33,7 @@ function saveCds(music, cb) {
 }
 
 app['delete']('/album/:id', (req, res) => {
-  getCds((err, music) => {
+  getMusic((err, music) => {
     if (err) return res.status(500).end(err);
 
     const id = req.params.id;
@@ -47,13 +47,33 @@ app['delete']('/album/:id', (req, res) => {
 });
 
 app.get('/album', (req, res) => {
-  res.set('Content-Type', 'application/json');
-  let rs = fs.createReadStream(filePath);
-  rs.pipe(res);
+  var property = req.query.sort;
+  var reverse = req.query.reverse === 'true';
+
+  getMusic(function (err, music) {
+    // Create an array of albums.
+    var albums = Object.keys(music).map(key => music[key]);
+
+    // Sort the array of albums.
+    albums.sort((left, right) => {
+      var leftValue = left[property];
+      var rightValue = right[property];
+      var leftType = typeof leftValue;
+      var compare =
+        leftType === 'string' ? leftValue.localeCompare(rightValue) :
+        leftType === 'number' ? leftValue - rightValue :
+        0; // don't know how to sort other types yet
+      return reverse ? compare * -1 : compare;
+    });
+
+    // Return the array of albums.
+    res.set('Content-Type', 'application/json');
+    res.end(JSON.stringify(albums));
+  });
 });
 
 app.get('/album/:id', (req, res) => {
-  getCds(function (err, music) {
+  getMusic(function (err, music) {
     if (err) return res.status(500).end(err);
 
     res.set('Content-Type', 'application/json');
@@ -63,7 +83,7 @@ app.get('/album/:id', (req, res) => {
 });
 
 app.post('/album', (req, res) => {
-  getCds((err, music) => {
+  getMusic((err, music) => {
     if (err) return res.status(500).end(err);
 
     const album = req.body;

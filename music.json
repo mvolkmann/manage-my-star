@@ -8,5 +8,40 @@
     "artist": "Joanna Newsom",
     "title": "Have One On Me",
     "rating": 4
+  },
+  "3": {
+    "artist": "Alpha",
+    "title": "Have One On Me",
+    "rating": 4
+  },
+  "4": {
+    "artist": "Beta",
+    "title": "Have One On Me",
+    "rating": 4
+  },
+  "5": {
+    "artist": "Gamma",
+    "title": "Have One On Me",
+    "rating": 4
+  },
+  "6": {
+    "artist": "Delta",
+    "title": "Have One On Me",
+    "rating": 4
+  },
+  "7": {
+    "artist": "Epsilon",
+    "title": "Have One On Me",
+    "rating": 4
+  },
+  "8": {
+    "artist": "Phi",
+    "title": "Have One On Me",
+    "rating": 4
+  },
+  "9": {
+    "artist": "Omega",
+    "title": "Have One On Me",
+    "rating": 4
   }
 }

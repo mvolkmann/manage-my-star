@@ -9,6 +9,7 @@ var jshint = require('gulp-jshint');
 var jsonlint = require('gulp-json-lint');
 var less = require('gulp-less');
 var livereload = require('gulp-livereload');
+var nodemon = require('gulp-nodemon');
 var plumber = require('gulp-plumber');
 var sourceMaps = require('gulp-sourcemaps');
 var traceur = require('gulp-traceur');
@@ -81,8 +82,18 @@ gulp.task('less', function () {
     pipe(gulp.dest('build'));
 });
 
-//gulp.task('lint', ['csslint', 'jshint', 'eslint', 'jsonlint']);
 gulp.task('lint', ['csslint', 'jshint', 'jsonlint']);
+
+// Restarts server when code changes.
+gulp.task('nodemon', function () {
+  /*
+  nodemon({
+    script: 'build/server.js',
+    // TODO: Configure this to only restart server when server.js changes.
+    ignore: ['']
+  });
+  */
+});
 
 gulp.task('transpile', ['jshint'], function () {
   return gulp.src(paths.jsNext).
@@ -111,4 +122,4 @@ gulp.task('watch', function () {
     livereload.changed);
 });
 
-gulp.task('default', ['less', 'transpile', 'watch']);
+gulp.task('default', ['less', 'transpile', 'nodemon', 'watch']);
