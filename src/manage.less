@@ -27,10 +27,45 @@ table {
   border-collapse: collapse;
 }
 
+td, th {
+  border-bottom: solid gray 1px;
+  border-right: solid gray 1px;
+  padding: 10px;
+  min-width: 200px;
+}
+
+th {
+  background-color: LightSalmon;
+  div {
+    font-size: 14pt;
+    font-weight: bold;
+  }
+}
+
+/* Overriding the Bootstrap caret class to make it bigger. */
+.caret {
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #000000;
+  float: right;
+}
+
+.dropdown {
+  float: right;
+}
+
+.dropdown-toggle .caret {
+  font-size: 24pt;
+}
+
+.filter {
+  width: 180px;
+}
+
 .manage-table-head {
   display: block;
   margin-top: 10px;
-  overflow: hidden;
+  overflow-x: hidden;
   width: @table-width;
 }
 
@@ -42,13 +77,9 @@ table {
   height: 200px;
 }
 
-td, th {
-  border-bottom: solid gray 1px;
-  border-right: solid gray 1px;
-  padding: 10px;
-  min-width: 200px;
+.manage-type-number {
+  text-align: right;
 }
 
-th {
-  background-color: LightSalmon;
+.manage-type-string {
 }

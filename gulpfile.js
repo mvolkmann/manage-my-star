@@ -33,22 +33,21 @@ gulp.task('clean', function (done) {
 
 gulp.task('csslint', function () {
   var options = {
-    'box-model': false,
-    'box-sizing': false,
+    //'box-model': false,
+    //'box-sizing': false,
     ids: false,
-    important: false,
-    'overqualified-elements': false,
-    'regex-selectors': false,
-    'qualified-headings': false,
-    'unique-headings': false,
-    'universal-selector': false,
-    'unqualified-attributes': false
+    //important: false,
+    //'overqualified-elements': false,
+    //'regex-selectors': false,
+    //'qualified-headings': false,
+    //'unique-headings': false,
+    //'universal-selector': false,
+    //'unqualified-attributes': false
   };
 
   return gulp.src(paths.css).
     pipe(cache('csslint')).
-    //pipe(csslint(options)).
-    pipe(csslint()).
+    pipe(csslint(options)).
     pipe(csslint.reporter());
 });
 
@@ -86,13 +85,11 @@ gulp.task('lint', ['csslint', 'jshint', 'jsonlint']);
 
 // Restarts server when code changes.
 gulp.task('nodemon', function () {
-  /*
   nodemon({
     script: 'build/server.js',
     // TODO: Configure this to only restart server when server.js changes.
     ignore: ['']
   });
-  */
 });
 
 gulp.task('transpile', ['jshint'], function () {
@@ -122,4 +119,5 @@ gulp.task('watch', function () {
     livereload.changed);
 });
 
-gulp.task('default', ['less', 'transpile', 'nodemon', 'watch']);
+//gulp.task('default', ['less', 'transpile', 'nodemon', 'watch']);
+gulp.task('default', ['less', 'transpile', 'watch']);

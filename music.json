@@ -43,5 +43,11 @@
     "artist": "Omega",
     "title": "Have One On Me",
     "rating": 4
+  },
+  "10": {
+    "artist": "Foo",
+    "title": "Bar",
+    "rating": "Baz",
+    "id": 10
   }
 }

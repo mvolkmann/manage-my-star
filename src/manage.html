@@ -20,17 +20,32 @@
   <thead>
     <tr>
       <th ng-repeat="field in fields">
-        <a ng-click="sortOn(field)">
-          {{field.label}}
-        </a>
-        <span ng-show="sortField === field && !reverse"
-          ng-click="sortOn(field)">
-          &#x25b2;
-        </span>
-        <span ng-show="sortField === field && reverse"
-          ng-click="sortOn(field)">
-          &#x25bc;
-        </span>
+        <div>
+          <a ng-click="sortOn(field)">
+            {{field.label}}
+          </a>
+          <span ng-show="sortField === field && !reverse"
+            ng-click="sortOn(field)">
+            &#x25b2;
+          </span>
+          <span ng-show="sortField === field && reverse"
+            ng-click="sortOn(field)">
+            &#x25bc;
+          </span>
+          <!--span class="caret" ng-click="filter($event, field)"></span-->
+        </div>
+        <input type="text" class="filter" ng-model="filter[field.property]"
+          ng-change="applyFilter()">
+        <!--span class="dropdown" dropdown on-toggle="tableHeadToggle(open)">
+          <a href class="dropdown-toggle" dropdown-toggle>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href>foo</a></li>
+            <li><a href>bar</a></li>
+            <li><a href>baz</a></li>
+          </ul>
+        </span-->
       </th>
       <th>Actions</th>
     </tr>
@@ -39,14 +54,14 @@
 <table class="manage-table-body">
   <tbody>
     <tr ng-repeat="album in albums">
-      <td>{{album.artist}}</td>
-      <td>{{album.title}}</td>
-      <td>{{album.rating}}</td>
+      <td class="manage-type-{{field.type}}" ng-repeat="field in fields">
+        {{album[field.property]}}
+      </td>
       <td>
         <button class="btn btn-default" ng-click="deleteAlbum($index)">
           Delete
         </button>
-        <button class="btn btn-default">
+        <button class="btn btn-default" ng-click="notImplemented()">
           Edit
         </button>
       </td>

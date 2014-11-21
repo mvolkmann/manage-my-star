@@ -1,6 +1,7 @@
 'use strict';
 /*global __dirname: true */
 
+require('../lib/traceur-runtime');
 let bodyParser = require('body-parser');
 let express = require('express');
 let fs = require('fs');
@@ -47,24 +48,52 @@ app['delete']('/album/:id', (req, res) => {
 });
 
 app.get('/album', (req, res) => {
-  var property = req.query.sort;
+  // Get query parameters related to sorting.
+  var sortProp = req.query.sort;
+  console.log('server.js GET /album: sortProp =', sortProp);
   var reverse = req.query.reverse === 'true';
+  console.log('server.js GET /album: reverse =', reverse);
+
+  // Get query parameters related to filtering.
+  var filter = {};
+  var prefix = 'filter-';
+  Object.keys(req.query).forEach(key => {
+    if (key.startsWith(prefix)) {
+      var prop = key.substring(prefix.length);
+      filter[prop] = req.query[key];
+    }
+  });
+  console.log('server.js GET /album: filter =', filter);
 
   getMusic(function (err, music) {
     // Create an array of albums.
     var albums = Object.keys(music).map(key => music[key]);
 
-    // Sort the array of albums.
-    albums.sort((left, right) => {
-      var leftValue = left[property];
-      var rightValue = right[property];
-      var leftType = typeof leftValue;
-      var compare =
-        leftType === 'string' ? leftValue.localeCompare(rightValue) :
-        leftType === 'number' ? leftValue - rightValue :
-        0; // don't know how to sort other types yet
-      return reverse ? compare * -1 : compare;
-    });
+    // Filter out ones that aren't desired.
+    albums = albums.filter(album =>
+      Object.keys(filter).every(prop => {
+        var filterValue = filter[prop];
+        var propValue = album[prop];
+        var type = typeof propValue;
+        return type === 'string' ? propValue.contains(filterValue) :
+          type === 'number' ? propValue >= filterValue :
+          true; //TODO: don't know how to handle other types yet
+      }));
+    //console.log('server.js GET /album: albums =', albums);
+
+    if (sortProp) {
+      // Sort the array of albums.
+      albums.sort((left, right) => {
+        var leftValue = left[sortProp];
+        var rightValue = right[sortProp];
+        var leftType = typeof leftValue;
+        var compare =
+          leftType === 'string' ? leftValue.localeCompare(rightValue) :
+          leftType === 'number' ? leftValue - rightValue :
+          0; // don't know how to sort other types yet
+        return reverse ? compare * -1 : compare;
+      });
+    }
 
     // Return the array of albums.
     res.set('Content-Type', 'application/json');
@@ -98,9 +127,9 @@ app.post('/album', (req, res) => {
 
 app.get('/field', (req, res) => {
   const fields = [
-    {label: 'Artist', property: 'artist'},
-    {label: 'Title', property: 'title'},
-    {label: 'Rating', property: 'rating'}
+    {label: 'Artist', property: 'artist', type: 'string'},
+    {label: 'Title', property: 'title', type: 'string'},
+    {label: 'Rating', property: 'rating', type: 'number'}
   ];
 
   res.set('Content-Type', 'application/json');
