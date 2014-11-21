@@ -43,8 +43,12 @@
       <td>{{album.title}}</td>
       <td>{{album.rating}}</td>
       <td>
-        <button class="btn btn-default" ng-click="deleteAlbum(id)">Delete</button>
-        <button class="btn btn-default">Edit</button>
+        <button class="btn btn-default" ng-click="deleteAlbum($index)">
+          Delete
+        </button>
+        <button class="btn btn-default">
+          Edit
+        </button>
       </td>
     </tr>
   </tbody>

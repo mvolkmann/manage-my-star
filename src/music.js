@@ -78,12 +78,12 @@
     };
 
     $scope.deleteAlbum = index => {
+      var album = albums[index];
       const msg = 'Are you sure you want to delete the album "' +
-        albums[index].title + '"?';
+        album.title + '" by "' + album.artist + '"?';
       if (confirm(msg)) {
-        var id = albums[index].id;
-        musicSvc.deleteAlbum(id).then(
-          () => delete album[index],
+        musicSvc.deleteAlbum(album.id).then(
+          () => albums.splice(index, 1),
           handleError
         );
       }
