@@ -28,7 +28,7 @@ function getMusic(cb) {
   });
 }
 
-function saveCds(music, cb) {
+function saveMusic(music, cb) {
   let json = JSON.stringify(music, null, 2);
   fs.writeFile(filePath, json, cb);
 }
@@ -40,7 +40,7 @@ app['delete']('/album/:id', (req, res) => {
     const id = req.params.id;
     delete music[id];
 
-    saveCds(music, err => {
+    saveMusic(music, err => {
       if (err) return res.status(500).end(err);
       res.end();
     });
@@ -50,9 +50,9 @@ app['delete']('/album/:id', (req, res) => {
 app.get('/album', (req, res) => {
   // Get query parameters related to sorting.
   var sortProp = req.query.sort;
-  console.log('server.js GET /album: sortProp =', sortProp);
+  //console.log('server.js GET /album: sortProp =', sortProp);
   var reverse = req.query.reverse === 'true';
-  console.log('server.js GET /album: reverse =', reverse);
+  //console.log('server.js GET /album: reverse =', reverse);
 
   // Get query parameters related to filtering.
   var filter = {};
@@ -63,11 +63,15 @@ app.get('/album', (req, res) => {
       filter[prop] = req.query[key];
     }
   });
-  console.log('server.js GET /album: filter =', filter);
+  //console.log('server.js GET /album: filter =', filter);
 
   getMusic(function (err, music) {
     // Create an array of albums.
-    var albums = Object.keys(music).map(key => music[key]);
+    var albums = Object.keys(music).map(id => {
+      var album = music[id];
+      album.id = id;
+      return album;
+    });
 
     // Filter out ones that aren't desired.
     albums = albums.filter(album =>
@@ -111,6 +115,7 @@ app.get('/album/:id', (req, res) => {
   });
 });
 
+// Adds a new album.
 app.post('/album', (req, res) => {
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
@@ -118,9 +123,24 @@ app.post('/album', (req, res) => {
     const album = req.body;
     album.id = Number(getHighestId(music)) + 1;
     music[album.id] = album;
-    saveCds(music, err => {
+    saveMusic(music, err => {
       if (err) return res.status(500).end(err);
       res.end('/album/' + album.id);
+    });
+  });
+});
+
+// Updates an existing album.
+app.put('/album/:id', (req, res) => {
+  getMusic((err, music) => {
+    if (err) return res.status(500).end(err);
+
+    const album = req.body;
+    const id = req.params.id;
+    music[id] = album;
+    saveMusic(music, err => {
+      if (err) return res.status(500).end(err);
+      res.end('/album/' + id);
     });
   });
 });

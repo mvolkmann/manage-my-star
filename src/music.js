@@ -27,22 +27,25 @@
       deleteAlbum(id) { return $http.delete('/album/' + id); },
       getFields() { return $http.get('/field'); },
       getAlbums(sortProperty = 'artist', reverse = false, filter = {}) {
-        var url = '/album?sort=' + sortProperty + '&reverse=' + reverse;
+        let url = '/album?sort=' + sortProperty + '&reverse=' + reverse;
         Object.keys(filter).forEach(prop => {
           url += '&filter-' + prop + '=' + filter[prop];
         });
         return $http.get(url);
+      },
+      updateAlbum(album) {
+        return $http.put('/album/' + album.id, album);
       }
     };
   }]);
 
 
   function setupTable() {
-    var head = $('.manage-table-head');
-    var body = $('.manage-table-body');
-    var offset = parseInt(head.css('margin-top')) + head.height();
+    let head = $('.manage-table-head');
+    let body = $('.manage-table-body');
+    let offset = parseInt(head.css('margin-top')) + head.height();
 
-    var head0 = head[0], body0 = body[0];
+    let head0 = head[0], body0 = body[0];
 
     body.on('scroll', () => {
       head0.scrollTop = body0.scrollTop - offset;
@@ -54,13 +57,25 @@
     '$modal', '$scope', 'albums', 'fields', 'musicSvc',
     ($modal, $scope, albums, fields, musicSvc) => {
 
+    function clearForm() {
+      fields.forEach(field => field.value = null);
+    }
+
+    function getAlbumFromForm() {
+      let album = {};
+      fields.forEach(field => {
+        album[field.property] = field.value;
+      });
+      return album;
+    }
+
     function updateTable() {
       musicSvc.getAlbums(
         $scope.sortField.property, $scope.reverse, $scope.filter).
         then(albums => $scope.albums = albums.data);
     }
 
-    var filterModal;
+    let filterModal;
     $scope.filter = {};
 
     setupTable();
@@ -73,20 +88,13 @@
     $scope.albums = albums;
 
     $scope.addAlbum = () => {
-      var album = {};
-      fields.forEach(field => {
-        album[field.property] = field.value;
-      });
+      let album = getAlbumFromForm();
       musicSvc.addAlbum(album).then(
-        res => {
-          res = res.data;
-          let index = res.lastIndexOf('/');
-          var id = res.substring(index + 1);
-          album.id = Number(id);
-          albums[id] = album;
+        () => {
+          clearForm();
+          updateTable(); // so new album is in sorted order
         },
-        handleError
-      );
+        handleError);
     };
 
     $scope.applyFilter = () => {
@@ -99,16 +107,28 @@
       updateTable();
     };
 
-    $scope.deleteAlbum = index => {
-      var album = albums[index];
+    $scope.deleteAlbum = (event, index) => {
+      let album = $scope.albums[index];
       const msg = 'Are you sure you want to delete the album "' +
         album.title + '" by "' + album.artist + '"?';
       if (confirm(msg)) {
         musicSvc.deleteAlbum(album.id).then(
-          () => albums.splice(index, 1),
+          () => $scope.albums.splice(index, 1),
           handleError
         );
       }
+
+      // Don't allow a click on a "Delete" button
+      // to be treated as a click on the table row
+      // which starts an edit.
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    };
+
+    $scope.edit = (index, album) => {
+      $scope.editId = album.id;
+      fields.forEach(field => field.value = album[field.property]);
     };
 
     $scope.filter = (event, field) => {
@@ -122,14 +142,14 @@
         size: 'sm',
         templateUrl: 'src/filter-dialog.html'
       });
-      var dialog = $('.modal-dialog');
+      let dialog = $('.modal-dialog');
 
       // Position the modal below the caret that was clicked.
-      var caret = $(event.target);
-      var offset = caret.offset();
-      var top = offset.top + caret.height();
-      var right = offset.left + caret.width();
-      var left = right - dialog.width();
+      let caret = $(event.target);
+      let offset = caret.offset();
+      let top = offset.top + caret.height();
+      let right = offset.left + caret.width();
+      let left = right - dialog.width();
       dialog.css({position: 'fixed', top: top, left: left});
 
     };
@@ -146,14 +166,25 @@
       if (!open) return;
 
       // Find the dropdown that is visible.
-      var dropdown = $('.dropdown-menu:visible');
-      var caret = dropdown.prev();
+      let dropdown = $('.dropdown-menu:visible');
+      let caret = dropdown.prev();
 
-      // Position the dropdown so it isn't clipped inside the table header.
-      var offset = dropdown.offset();
-      var right = caret.offset().left + caret.width();
-      var left = right - dropdown.width();
+      // Position the dropdown.
+      // Setting the CSS position property to "fixed"
+      // prevents it from being clipped by the bounds of the table header.
+      let offset = dropdown.offset();
+      let right = caret.offset().left + caret.width();
+      const bodyPadding = 20;
+      let left = right - dropdown.width() + bodyPadding;
       dropdown.css({position: 'fixed', top: offset.top, left: left});
+    };
+
+    $scope.update = () => {
+      let album = getAlbumFromForm();
+      album.id = $scope.editId;
+      musicSvc.updateAlbum(album).then(
+        updateTable, // so new album is in sorted order
+        handleError);
     };
   }]);
 })();

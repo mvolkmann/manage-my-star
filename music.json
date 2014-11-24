@@ -2,52 +2,19 @@
   "1": {
     "artist": "Jessica Hoop",
     "title": "Kismet",
-    "rating": 3
+    "rating": "2",
+    "id": "1"
   },
   "2": {
     "artist": "Joanna Newsom",
     "title": "Have One On Me",
-    "rating": 4
-  },
-  "3": {
-    "artist": "Alpha",
-    "title": "Have One On Me",
-    "rating": 4
-  },
-  "4": {
-    "artist": "Beta",
-    "title": "Have One On Me",
-    "rating": 4
+    "rating": "3",
+    "id": "2"
   },
   "5": {
-    "artist": "Gamma",
-    "title": "Have One On Me",
-    "rating": 4
-  },
-  "6": {
-    "artist": "Delta",
-    "title": "Have One On Me",
-    "rating": 4
-  },
-  "7": {
-    "artist": "Epsilon",
-    "title": "Have One On Me",
-    "rating": 4
-  },
-  "8": {
-    "artist": "Phi",
-    "title": "Have One On Me",
-    "rating": 4
-  },
-  "9": {
-    "artist": "Omega",
-    "title": "Have One On Me",
-    "rating": 4
-  },
-  "10": {
-    "artist": "Foo",
-    "title": "Bar",
-    "rating": "Baz",
-    "id": 10
+    "artist": "Belly",
+    "title": "Star",
+    "rating": "3",
+    "id": 5
   }
 }

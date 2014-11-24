@@ -115,7 +115,7 @@ gulp.task('watch', function () {
   gulp.watch(paths.json, ['jsonlint']);
   gulp.watch(paths.less, ['less']);
 
-  gulp.watch([paths.css, paths.html, paths.json],
+  gulp.watch([paths.css, paths.html],
     livereload.changed);
 });
 
