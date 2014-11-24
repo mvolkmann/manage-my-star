@@ -9,7 +9,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node build/server.js"
+    "start": "gulp less transpile; node build/server.js"
   },
   "author": "R. Mark Volkmann",
   "license": "MIT",
