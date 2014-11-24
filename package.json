@@ -2,6 +2,10 @@
   "name": "music",
   "version": "1.0.0",
   "description": "demo of \"Manage My *\"",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mvolkmann/manage-my-star.git"
+  },
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
