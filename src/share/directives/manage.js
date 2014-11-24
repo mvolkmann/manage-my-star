@@ -126,7 +126,10 @@
         $scope.objToStr(obj) + '?';
       dialogSvc.confirm(msg).then(() =>
         manageSvc.deleteObject(obj.id).then(
-          () => $scope.objects.splice(index, 1),
+          () => {
+            clearForm();
+            $scope.objects.splice(index, 1);
+          },
           handleError
         ));
 

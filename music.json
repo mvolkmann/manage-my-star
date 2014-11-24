@@ -2,14 +2,8 @@
   "1": {
     "artist": "Jessica Hoop",
     "title": "Kismet",
-    "rating": "2",
-    "id": "1"
-  },
-  "2": {
-    "artist": "Joanna Newsom",
-    "title": "Have One On Me",
     "rating": "3",
-    "id": "2"
+    "id": "1"
   },
   "5": {
     "artist": "Belly",
@@ -18,14 +12,14 @@
     "id": 5
   },
   "6": {
-    "artist": "AlphaX",
-    "title": "BetaX",
-    "rating": "3",
-    "id": "6"
+    "artist": "Joanna Newsom",
+    "title": "Have One On Me",
+    "rating": "4",
+    "id": 6
   },
   "7": {
-    "artist": "AlphaXY",
-    "title": "BetaXY",
+    "artist": "Modest Mouse",
+    "title": "Building Nothing Out of Something",
     "rating": "4",
     "id": 7
   }
