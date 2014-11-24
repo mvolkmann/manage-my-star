@@ -7,11 +7,11 @@
 
 <div class="row">
   <label></label>
-  <button class="btn btn-default" ng-click="addAlbum()"
+  <button class="btn btn-default" ng-click="addObject()"
     ng-disabled="myForm.$invalid">
     Add
   </button>
-  <button class="btn btn-default" ng-click="update()"
+  <button class="btn btn-default" ng-click="updateObject()"
     ng-disabled="!editId || myForm.$invalid">
     Update
   </button>
@@ -53,13 +53,16 @@
 </table>
 <table class="manage-table-body">
   <tbody>
-    <tr ng-repeat="album in albums" ng-click="edit($index, album)">
+    <tr ng-repeat="obj in objects" ng-click="editObject($index, obj)">
       <td class="manage-type-{{field.type}}" ng-repeat="field in fields">
-        {{album[field.property]}}
+        {{obj[field.property]}}
       </td>
       <td>
-        <button class="btn btn-default" ng-click="deleteAlbum($event, $index)">
+        <button class="btn btn-default" ng-click="deleteObject($event, $index)">
           Delete
+        </button>
+        <button class="btn btn-default" ng-click="notImplemented()">
+          Foo
         </button>
       </td>
     </tr>

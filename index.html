@@ -3,18 +3,35 @@
   <head>
     <title>Music Collection</title>
     <meta charset="utf-8">
+
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="lib/bootstrap-3.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="build/manage.css">
+    <link rel="stylesheet" href="build/share/manage.css">
+
     <script src="lib/jquery-2.1.1.min.js"></script>
     <script src="lib/angular-1.2.26.min.js"></script>
-    <script src="lib/angular-ui-router.min.js"></script>
+    <!--script src="lib/angular-ui-router.min.js"></script-->
     <script src="lib/bootstrap-3.3.1/js/bootstrap.min.js"></script>
     <script src="lib/ui-bootstrap-tpls-0.12.0.min.js"></script>
-    <script src="build/music.js"></script>
     <script src="http://localhost:35729/livereload.js"></script>
+
+    <script src="build/share/main.js"></script>
+    <script src="build/share/filters.js"></script>
+    <script src="build/share/directives/main.js"></script>
+    <script src="build/share/directives/dialog.js"></script>
+    <script src="build/share/directives/manage.js"></script>
+    <script src="build/music/main.js"></script>
   </head>
   <body>
-    <div ui-view>The view is loading.</div>
+    <div manage-my-star ng-controller="MusicCtrl"
+      resource="album"
+      sort-property="title"
+      obj-to-str="albumToString">
+    </div>
+
+    <div id="global-error" mtz-dialog heading="{{title}}">
+      <span ng-bind-html="message | raw"></span>
+    </div>
+    <div ng-include="'src/share/directives/confirm.html'"></div>
   </body>
 </html>

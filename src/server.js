@@ -145,7 +145,7 @@ app.put('/album/:id', (req, res) => {
   });
 });
 
-app.get('/field', (req, res) => {
+app.get('/album-field', (req, res) => {
   const fields = [
     {label: 'Artist', property: 'artist', type: 'string'},
     {label: 'Title', property: 'title', type: 'string'},

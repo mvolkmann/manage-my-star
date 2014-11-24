@@ -1,0 +1,14 @@
+<div>
+  <div class="modal-header">
+    <button class="close" ng-click="$dismiss()">&times;</button>
+    <h3 class="modal-title">Filter {{field.label}}</h3>
+  </div>
+  <div class="modal-body">
+    <label>Filter</label>
+    <input type="text" autofocus ng-model="filter.text">
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="applyFilter()">OK</button>
+    <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+  </div>
+</div>

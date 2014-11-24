@@ -16,5 +16,17 @@
     "title": "Star",
     "rating": "3",
     "id": 5
+  },
+  "6": {
+    "artist": "AlphaX",
+    "title": "BetaX",
+    "rating": "3",
+    "id": "6"
+  },
+  "7": {
+    "artist": "AlphaXY",
+    "title": "BetaXY",
+    "rating": "4",
+    "id": 7
   }
 }

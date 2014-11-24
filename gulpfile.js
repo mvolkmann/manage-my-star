@@ -20,11 +20,11 @@ var indexHtml = contentDir + '/index.html';
 
 var paths = {
   css: 'build/*.css',
-  html: ['index.html', 'src/*.html'],
-  js: ['gulpfile.js', 'src/*.js'],
-  jsNext: ['src/*.js'],
+  html: ['index.html', 'src/**/*.html'],
+  js: ['gulpfile.js', 'src/**/*.js'],
+  jsNext: ['src/**/*.js'],
   json: ['*.json'],
-  less: 'src/*.less'
+  less: 'src/**/*.less'
 };
 
 gulp.task('clean', function (done) {

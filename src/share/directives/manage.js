@@ -1,40 +1,42 @@
-(function () {
+(() => {
   'use strict';
 
-  let app = angular.module('Music', ['ui.bootstrap', 'ui.router']);
+  let module = angular.module('mtz-directives');
 
-  function handleError(err) {
-    alert(err);
+  var resourceName;
+
+  // Temporary polyfill until Traceur adds this.
+  if (!Array.prototype.find) {
+    Array.prototype.find = function (fn) {
+      for (var i = 0; i < this.length; i++) {
+        var value = this[i];
+        if (fn(value)) return value;
+      }
+      return undefined;
+    };
   }
 
-  app.config(($stateProvider, $urlRouterProvider) => {
-    $urlRouterProvider.otherwise('/music');
-    $stateProvider.
-      state('music', {
-        url: '/music',
-        templateUrl: 'src/manage.html',
-        controller: 'ManageCtrl',
-        resolve: {
-          fields: ['musicSvc', svc => svc.getFields()],
-          albums: ['musicSvc', svc => svc.getAlbums()]
-        }
-      });
-  });
-
-  app.factory('musicSvc', ['$http', $http => {
+  module.factory('manageSvc', ['$http', $http => {
     return {
-      addAlbum(album) { return $http.post('/album', album); },
-      deleteAlbum(id) { return $http.delete('/album/' + id); },
-      getFields() { return $http.get('/field'); },
-      getAlbums(sortProperty = 'artist', reverse = false, filter = {}) {
-        let url = '/album?sort=' + sortProperty + '&reverse=' + reverse;
+      addObject(obj) {
+        return $http.post('/' + resourceName, obj);
+      },
+      deleteObject(id) {
+        return $http.delete('/' + resourceName + '/' + id);
+      },
+      getFields() {
+        return $http.get('/' + resourceName + '-field');
+      },
+      getObjects(sortProperty, reverse = false, filter = {}) {
+        let url = '/' + resourceName +
+          '?sort=' + sortProperty + '&reverse=' + reverse;
         Object.keys(filter).forEach(prop => {
           url += '&filter-' + prop + '=' + filter[prop];
         });
         return $http.get(url);
       },
-      updateAlbum(album) {
-        return $http.put('/album/' + album.id, album);
+      updateObject(obj) {
+        return $http.put('/' + resourceName + '/' + obj.id, obj);
       }
     };
   }]);
@@ -53,43 +55,54 @@
     });
   }
 
-  app.controller('ManageCtrl', [
-    '$modal', '$scope', 'albums', 'fields', 'musicSvc',
-    ($modal, $scope, albums, fields, musicSvc) => {
+  module.controller('ManageCtrl', [
+    '$modal', '$scope', 'dialogSvc', 'manageSvc',
+    ($modal, $scope, dialogSvc, manageSvc) => {
 
     function clearForm() {
-      fields.forEach(field => field.value = null);
+      $scope.fields.forEach(field => field.value = null);
     }
 
-    function getAlbumFromForm() {
-      let album = {};
-      fields.forEach(field => {
-        album[field.property] = field.value;
+    function getObjectFromForm() {
+      let obj = {};
+      $scope.fields.forEach(field => {
+        obj[field.property] = field.value;
       });
-      return album;
+      return obj;
+    }
+
+    function handleError(err) {
+      dialogSvc.showError('Manage My * Error', err);
     }
 
     function updateTable() {
-      musicSvc.getAlbums(
+      manageSvc.getObjects(
         $scope.sortField.property, $scope.reverse, $scope.filter).
-        then(albums => $scope.albums = albums.data);
+        then(objects => $scope.objects = objects.data);
     }
+
+    resourceName = $scope.resource;
+
+    manageSvc.getFields().then(
+      res => {
+        $scope.fields = res.data;
+        $scope.sortField = $scope.fields.find(
+          field => field.property === $scope.sortProperty);
+      },
+      res => handleError(res.data));
+
+    manageSvc.getObjects($scope.sortProperty).then(
+      res => $scope.objects = res.data,
+      res => handleError(res.data));
 
     let filterModal;
     $scope.filter = {};
 
     setupTable();
 
-    fields = fields.data;
-    $scope.fields = fields;
-    $scope.sortField = fields[0];
-
-    albums = albums.data;
-    $scope.albums = albums;
-
-    $scope.addAlbum = () => {
-      let album = getAlbumFromForm();
-      musicSvc.addAlbum(album).then(
+    $scope.addObject = () => {
+      let album = getObjectFromForm();
+      manageSvc.addObject(album).then(
         () => {
           clearForm();
           updateTable(); // so new album is in sorted order
@@ -107,16 +120,15 @@
       updateTable();
     };
 
-    $scope.deleteAlbum = (event, index) => {
-      let album = $scope.albums[index];
-      const msg = 'Are you sure you want to delete the album "' +
-        album.title + '" by "' + album.artist + '"?';
-      if (confirm(msg)) {
-        musicSvc.deleteAlbum(album.id).then(
-          () => $scope.albums.splice(index, 1),
+    $scope.deleteObject = (event, index) => {
+      let obj = $scope.objects[index];
+      const msg = 'Are you sure you want to delete ' +
+        $scope.objToStr(obj) + '?';
+      dialogSvc.confirm(msg).then(() =>
+        manageSvc.deleteObject(obj.id).then(
+          () => $scope.objects.splice(index, 1),
           handleError
-        );
-      }
+        ));
 
       // Don't allow a click on a "Delete" button
       // to be treated as a click on the table row
@@ -126,9 +138,9 @@
       return false;
     };
 
-    $scope.edit = (index, album) => {
-      $scope.editId = album.id;
-      fields.forEach(field => field.value = album[field.property]);
+    $scope.editObject = (index, obj) => {
+      $scope.editId = obj.id;
+      $scope.fields.forEach(field => field.value = obj[field.property]);
     };
 
     $scope.filter = (event, field) => {
@@ -154,7 +166,7 @@
 
     };
 
-    $scope.notImplemented = () => alert('Not implemented yet');
+    $scope.notImplemented = () => handleError('Not implemented yet');
 
     $scope.sortOn = field => {
       $scope.reverse = field === $scope.sortField && !$scope.reverse;
@@ -179,12 +191,25 @@
       dropdown.css({position: 'fixed', top: offset.top, left: left});
     };
 
-    $scope.update = () => {
-      let album = getAlbumFromForm();
+    $scope.updateObject = () => {
+      let album = getObjectFromForm();
       album.id = $scope.editId;
-      musicSvc.updateAlbum(album).then(
+      manageSvc.updateObject(album).then(
         updateTable, // so new album is in sorted order
         handleError);
     };
   }]);
+
+  module.directive('manageMyStar', () => {
+    return {
+      restrict: 'AE',
+      scope: {
+        resource: '@',
+        sortProperty: '@',
+        objToStr: '='
+      },
+      controller: 'ManageCtrl',
+      templateUrl: 'src/share/directives/manage.html',
+    };
+  });
 })();
