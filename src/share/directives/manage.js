@@ -204,15 +204,27 @@
   }]);
 
   module.directive('manageMyStar', () => {
+    function toBoolean(s) { return s === 'true'; }
+
     return {
       restrict: 'AE',
       scope: {
+        canAdd: '@',
+        canDelete: '@',
+        canUpdate: '@',
         resource: '@',
         sortProperty: '@',
         objToStr: '='
       },
       controller: 'ManageCtrl',
       templateUrl: 'src/share/directives/manage.html',
+      link: scope => {
+        scope.canAdd = toBoolean(scope.canAdd);
+        scope.canDelete = toBoolean(scope.canDelete);
+        scope.canUpdate = toBoolean(scope.canUpdate);
+        scope.showForm = scope.canAdd || scope.canUpdate;
+        scope.actionCount = scope.canDelete ? 1 : 0;
+      }
     };
   });
 })();

@@ -1,17 +1,19 @@
-<form name="myForm">
+<form ng-if="showForm" name="myForm">
   <div class="row" ng-repeat="field in fields">
     <label>{{field.label}}</label>
     <input class="form-control" type="text" ng-model="field.value" required>
   </div>
 </form>
 
-<div class="row">
+<div ng-if="showForm" class="row">
   <label></label>
-  <button class="btn btn-default" ng-click="addObject()"
+  <button ng-if="canAdd" class="btn btn-default"
+    ng-click="addObject()"
     ng-disabled="myForm.$invalid">
     Add
   </button>
-  <button class="btn btn-default" ng-click="updateObject()"
+  <button ng-if="canUpdate" class="btn btn-default"
+    ng-click="updateObject()"
     ng-disabled="!editId || myForm.$invalid">
     Update
   </button>
@@ -47,7 +49,7 @@
         <input type="text" class="filter" ng-model="filter[field.property]"
           ng-change="applyFilter()">
       </th>
-      <th>Actions</th>
+      <th><div>Actions</div></th>
     </tr>
   </thead>
 </table>
@@ -57,13 +59,14 @@
       <td class="manage-type-{{field.type}}" ng-repeat="field in fields">
         {{obj[field.property]}}
       </td>
-      <td>
-        <button class="btn btn-default" ng-click="deleteObject($event, $index)">
+      <td ng-if="actionCount > 0">
+        <button ng-if="canDelete" class="btn btn-default"
+          ng-click="deleteObject($event, $index)">
           Delete
         </button>
-        <button class="btn btn-default" ng-click="notImplemented()">
+        <!--button class="btn btn-default" ng-click="notImplemented()">
           Foo
-        </button>
+        </button-->
       </td>
     </tr>
   </tbody>
