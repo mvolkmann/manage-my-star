@@ -19,7 +19,7 @@ var contentDir = 'content/common';
 var indexHtml = contentDir + '/index.html';
 
 var paths = {
-  css: 'build/*.css',
+  css: 'build/**/*.css',
   html: ['index.html', 'src/**/*.html'],
   js: ['gulpfile.js', 'src/**/*.js'],
   jsNext: ['src/**/*.js'],
