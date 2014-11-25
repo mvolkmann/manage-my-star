@@ -3,7 +3,7 @@
 
   let module = angular.module('mtz-directives');
 
-  var resourceName;
+  var dropDownDisplayed, resourceName;
 
   // Temporary polyfill until Traceur adds this.
   if (!Array.prototype.find) {
@@ -41,17 +41,48 @@
     };
   }]);
 
+  /**
+   * Repeated tries to find a DOM element that matches a given selector
+   * until it succeeds.  This is useful when the element is being
+   * added asynchronously and doesn't exist yet.
+   */
+  function getJq(selector) {
+    function find(cb) {
+      var jq = $(selector);
+      if (jq.length) { // found
+        cb(jq);
+      } else { // not found
+        setTimeout(() => find(cb), 50);
+      }
+    }
+
+    return new Promise(resolve => find(resolve));
+  }
 
   function setupTable() {
-    let head = $('.manage-table-head');
-    let body = $('.manage-table-body');
-    let offset = parseInt(head.css('margin-top')) + head.height();
+    var promises = [
+      getJq('.manage-table-head'),
+      getJq('.manage-table-body')
+    ];
+    Promise.all(promises).then(jqs => {
+      let [head, body] = jqs;
 
-    let head0 = head[0], body0 = body[0];
+      // Find the bottom y coordinate of the table head.
+      let headBottomY = parseInt(head.css('margin-top')) + head.height();
 
-    body.on('scroll', () => {
-      head0.scrollTop = body0.scrollTop - offset;
-      head0.scrollLeft = body0.scrollLeft;
+      // Get references to DOM elements from the jQuery objects.
+      let head0 = head[0], body0 = body[0];
+
+      body.on('scroll', event => {
+        if (dropDownDisplayed) {
+          console.log('manage.js x: preventing scroll');
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+        head0.scrollTop = body0.scrollTop - headBottomY;
+        head0.scrollLeft = body0.scrollLeft;
+      });
     });
   }
 
@@ -178,6 +209,7 @@
     };
 
     $scope.tableHeadToggle = (open) => {
+      dropDownDisplayed = open;
       if (!open) return;
 
       // Find the dropdown that is visible.
