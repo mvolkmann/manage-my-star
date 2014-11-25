@@ -1,3 +1,4 @@
+@cell-width: 200px;
 @label-width: 70px;
 @table-width: 600px; // 100%;
 
@@ -32,7 +33,7 @@ td, th {
   border-bottom: solid gray 1px;
   border-right: solid gray 1px;
   padding: 10px;
-  min-width: 200px;
+  min-width: @cell-width;
 }
 
 th {
@@ -40,6 +41,9 @@ th {
   div {
     font-size: 14pt;
     font-weight: bold;
+  }
+  input {
+    width: 50px;
   }
 }
 
@@ -60,7 +64,7 @@ th {
 }
 
 .filter {
-  width: 180px;
+  width: @cell-width - 21;
 }
 
 .manage-table-head {

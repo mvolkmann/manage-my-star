@@ -3,7 +3,7 @@
 
   let module = angular.module('mtz-directives');
 
-  var dropDownDisplayed, resourceName;
+  var dropDownDisplayed, resourceName, tableBody;
 
   // Temporary polyfill until Traceur adds this.
   if (!Array.prototype.find) {
@@ -66,6 +66,7 @@
     ];
     Promise.all(promises).then(jqs => {
       let [head, body] = jqs;
+      tableBody = body;
 
       // Find the bottom y coordinate of the table head.
       let headBottomY = parseInt(head.css('margin-top')) + head.height();
@@ -75,11 +76,11 @@
 
       body.on('scroll', event => {
         if (dropDownDisplayed) {
-          console.log('manage.js x: preventing scroll');
-          event.preventDefault();
-          event.stopPropagation();
-          return false;
+          // Preventing scroll table body.
+          body.css('overflow', 'hidden');
+          return;
         }
+
         head0.scrollTop = body0.scrollTop - headBottomY;
         head0.scrollLeft = body0.scrollLeft;
       });
@@ -197,7 +198,6 @@
       let right = offset.left + caret.width();
       let left = right - dialog.width();
       dialog.css({position: 'fixed', top: top, left: left});
-
     };
 
     $scope.notImplemented = () => handleError('Not implemented yet');
@@ -210,7 +210,12 @@
 
     $scope.tableHeadToggle = (open) => {
       dropDownDisplayed = open;
-      if (!open) return;
+      if (!open) {
+        // Resume scroll table body.
+        tableBody.css('overflow', 'scroll');
+
+        return;
+      }
 
       // Find the dropdown that is visible.
       let dropdown = $('.dropdown-menu:visible');
