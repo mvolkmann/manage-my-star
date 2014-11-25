@@ -4,12 +4,18 @@
   <form ng-if="showForm" name="myForm">
     <div class="row" ng-repeat="field in fields">
       <label>{{field.label}}</label>
-      <input class="form-control" type="text" ng-model="field.value" required>
+      <input class="form-control" type="text"
+        ng-model="field.value"
+        ng-readonly="editId && field.readonly"
+        required>
     </div>
   </form>
 
   <div ng-if="showForm" class="row">
     <label></label>
+    <button class="btn btn-default" ng-click="clearForm()">
+      Clear
+    </button>
     <button ng-if="canAdd" class="btn btn-default"
       ng-click="addObject()"
       ng-disabled="myForm.$invalid">

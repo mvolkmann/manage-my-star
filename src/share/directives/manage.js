@@ -91,10 +91,6 @@
     '$modal', '$scope', 'dialogSvc', 'manageSvc',
     ($modal, $scope, dialogSvc, manageSvc) => {
 
-    function clearForm() {
-      $scope.fields.forEach(field => field.value = null);
-    }
-
     function getObjectFromForm() {
       let obj = {};
       $scope.fields.forEach(field => {
@@ -136,7 +132,7 @@
       let album = getObjectFromForm();
       manageSvc.addObject(album).then(
         () => {
-          clearForm();
+          $scope.clearForm();
           updateTable(); // so new album is in sorted order
         },
         handleError);
@@ -152,6 +148,11 @@
       updateTable();
     };
 
+    $scope.clearForm = () => {
+      $scope.editId = null;
+      $scope.fields.forEach(field => field.value = null);
+    };
+
     $scope.deleteObject = (event, index) => {
       let obj = $scope.objects[index];
       const msg = 'Are you sure you want to delete ' +
@@ -159,7 +160,7 @@
       dialogSvc.confirm(msg).then(() =>
         manageSvc.deleteObject(obj.id).then(
           () => {
-            clearForm();
+            $scope.clearForm();
             $scope.objects.splice(index, 1);
           },
           handleError
@@ -174,6 +175,7 @@
     };
 
     $scope.editObject = (index, obj) => {
+      if (!$scope.canUpdate) return;
       $scope.editId = obj.id;
       $scope.fields.forEach(field => field.value = obj[field.property]);
     };
@@ -241,14 +243,12 @@
   }]);
 
   module.directive('manageMyStar', () => {
-    function toBoolean(s) { return s === 'true'; }
-
     return {
       restrict: 'AE',
       scope: {
-        canAdd: '@',
-        canDelete: '@',
-        canUpdate: '@',
+        canAdd: '=', // must use = instead of @ for booleans
+        canDelete: '=',
+        canUpdate: '=',
         resource: '@',
         sortProperty: '@',
         objToStr: '='
@@ -256,9 +256,6 @@
       controller: 'ManageCtrl',
       templateUrl: 'src/share/directives/manage.html',
       link: scope => {
-        scope.canAdd = toBoolean(scope.canAdd);
-        scope.canDelete = toBoolean(scope.canDelete);
-        scope.canUpdate = toBoolean(scope.canUpdate);
         scope.showForm = scope.canAdd || scope.canUpdate;
         scope.actionCount = scope.canDelete ? 1 : 0;
       }
