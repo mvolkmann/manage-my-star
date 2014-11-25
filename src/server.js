@@ -62,7 +62,7 @@ app.get('/album', (req, res) => {
     }
   });
 
-  getMusic(function (err, music) {
+  getMusic((err, music) => {
     // Create an array of albums.
     var albums = Object.keys(music).map(id => {
       var album = music[id];
@@ -109,7 +109,7 @@ app.get('/album', (req, res) => {
 });
 
 app.get('/album/:id', (req, res) => {
-  getMusic(function (err, music) {
+  getMusic((err, music) => {
     if (err) return res.status(500).end(err);
 
     res.set('Content-Type', 'application/json');
