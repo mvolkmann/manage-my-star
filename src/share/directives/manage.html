@@ -31,7 +31,7 @@
   <table class="manage-table-head">
     <thead>
       <tr>
-        <th ng-repeat="field in fields">
+        <th ng-repeat="field in fields" ng-if="!isHidden(field)">
           <div>
             <a ng-click="sortOn(field)">
               {{field.label}}
@@ -68,7 +68,9 @@
   <table class="manage-table-body">
     <tbody>
       <tr ng-repeat="obj in objects" ng-click="editObject($index, obj)">
-        <td class="manage-type-{{field.type}}" ng-repeat="field in fields">
+        <td class="manage-type-{{field.type}}"
+          ng-repeat="field in fields"
+          ng-if="!isHidden(field)">
           {{obj[field.property]}}
         </td>
         <td ng-if="actionCount > 0">

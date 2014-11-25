@@ -216,6 +216,8 @@
       return type === 'number' ? 'number' : 'text';
     };
 
+    $scope.isHidden = field => $scope.hiddenProps.includes(field.property);
+
     $scope.isReadOnly = (field, obj) => {
       if (!obj) return false;
       if (field.readOnly) return true;
@@ -274,6 +276,7 @@
         canDelete: '=',
         canFilter: '=',
         canUpdate: '=',
+        hideProps: '@', // comma-separated list of property names
         resource: '@',
         sortProperty: '@',
         objToStr: '='
@@ -281,6 +284,9 @@
       controller: 'ManageCtrl',
       templateUrl: 'src/share/directives/manage.html',
       link: scope => {
+        scope.hiddenProps = scope.hideProps ?
+          scope.hideProps.split(',').map(s => s.trim()) :
+          [];
         scope.showForm = scope.canAdd || scope.canUpdate;
         scope.actionCount = scope.canDelete ? 1 : 0;
       }
