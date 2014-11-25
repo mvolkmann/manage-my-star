@@ -7,22 +7,6 @@ body {
   padding: 20px;
 }
 
-div.row {
-  margin-top: 10px;
-
-  label {
-    display: inline-block;
-    text-align: right;
-    width: @label-width;
-  }
-
-  input {
-    display: inline-block;
-    margin-left: 5px;
-    width: 300px;
-  }
-}
-
 table {
   border-left: solid gray 1px;
   border-top: solid gray 1px;
@@ -87,4 +71,30 @@ th {
 }
 
 .manage-type-string {
+}
+
+.row {
+  label {
+    text-align: right;
+    width: @label-width;
+  }
+
+  input {
+    display: inline-block;
+    margin-left: 5px;
+    width: 300px;
+  }
+
+  input[type=checkbox] {
+    margin-top: 0;
+    vertical-align: -10px;
+  }
+
+  .checkbox {
+    margin-top: 0;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
 }

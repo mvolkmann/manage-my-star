@@ -3,13 +3,13 @@
 
   let module = angular.module('mtz-directives');
 
-  var dropDownDisplayed, resourceName, tableBody;
+  let dropDownDisplayed, resourceName, tableBody;
 
   // Temporary polyfill until Traceur adds this.
   if (!Array.prototype.find) {
     Array.prototype.find = function (fn) {
-      for (var i = 0; i < this.length; i++) {
-        var value = this[i];
+      for (let i = 0; i < this.length; i++) {
+        let value = this[i];
         if (fn(value)) return value;
       }
       return undefined;
@@ -24,6 +24,16 @@
   }
 
   module.factory('manageSvc', ['$http', $http => {
+
+    function getFilterQueryParams(filter, prefix) {
+      let s = '';
+      Object.keys(filter).forEach(prop => {
+        let value = filter[prop];
+        if (value) s += '&' + prefix + '-' + prop + '=' + value;
+      });
+      return s;
+    }
+
     return {
       addObject(obj) {
         return $http.post('/' + resourceName, obj);
@@ -34,14 +44,12 @@
       getFields() {
         return $http.get('/' + resourceName + '-field');
       },
-      getObjects(sortProperty, reverse = false, filter = {}) {
-        let url = '/' + resourceName +
-          '?sort=' + sortProperty + '&reverse=' + reverse;
-        Object.keys(filter).forEach(prop => {
-          let value = filter[prop];
-          if (value === null) value = '';
-          url += '&filter-' + prop + '=' + value;
-        });
+      getObjects(sortProperty, reverse, autoFilter, filter) {
+        let url = '/' + resourceName + '?sort=' + sortProperty;
+        if (reverse) url += '&reverse=' + reverse;
+        url += getFilterQueryParams(autoFilter, 'af');
+        url += getFilterQueryParams(filter, 'filter');
+        //console.log('manage.js getObjects: url =', url);
         return $http.get(url);
       },
       updateObject(obj) {
@@ -57,7 +65,7 @@
    */
   function getJq(selector) {
     function find(cb) {
-      var jq = $(selector);
+      let jq = $(selector);
       if (jq.length) { // found
         cb(jq);
       } else { // not found
@@ -69,7 +77,7 @@
   }
 
   function setupTable() {
-    var promises = [
+    let promises = [
       getJq('.manage-table-head'),
       getJq('.manage-table-body')
     ];
@@ -100,6 +108,29 @@
     '$modal', '$scope', 'dialogSvc', 'manageSvc',
     ($modal, $scope, dialogSvc, manageSvc) => {
 
+    let filterModal;
+
+    function convertType(value) {
+      let num = Number(value);
+      return value === 'true' ? true :
+        value === 'false' ? false :
+        !Number.isNaN(num) ? num :
+        value;
+    }
+
+    function getAutoFilter() {
+      let filter = {};
+      if ($scope.af) {
+        $scope.af.split(',').forEach(s => {
+          let [name, value] = s.split('=');
+          name = name.trim();
+          value = value.trim();
+          filter[name] = convertType(value);
+        });
+      }
+      return filter;
+    }
+
     function getObjectFromForm() {
       let obj = {};
       $scope.fields.forEach(field => {
@@ -114,26 +145,25 @@
 
     function updateTable() {
       manageSvc.getObjects(
-        $scope.sortField.property, $scope.reverse, $scope.filter).
-        then(objects => $scope.objects = objects.data);
+        $scope.sortField.property,
+        $scope.reverse,
+        $scope.autoFilter,
+        $scope.filter).then(
+        res => $scope.objects = res.data,
+        res => handleError(res.data));
     }
 
     resourceName = $scope.resource;
+    $scope.autoFilter = getAutoFilter();
 
     manageSvc.getFields().then(
       res => {
         $scope.fields = res.data;
         $scope.sortField = $scope.fields.find(
           field => field.property === $scope.sortProperty);
+        updateTable();
       },
       res => handleError(res.data));
-
-    manageSvc.getObjects($scope.sortProperty).then(
-      res => $scope.objects = res.data,
-      res => handleError(res.data));
-
-    let filterModal;
-    $scope.filter = {};
 
     setupTable();
 
@@ -212,8 +242,17 @@
     };
 
     $scope.getInputType = field => {
-      var type = field.type;
-      return type === 'number' ? 'number' : 'text';
+      let type = field.type;
+      return type === 'boolean' ? 'checkbox' :
+        type === 'number' ? 'number' :
+        'text';
+    };
+
+    $scope.getPropValue = (obj, field) => {
+      let value = obj[field.property];
+      let type = field.type;
+      if (type === 'boolean' && !value) value = false;
+      return value;
     };
 
     $scope.isHidden = field => $scope.hiddenProps.includes(field.property);
@@ -272,6 +311,7 @@
     return {
       restrict: 'AE',
       scope: {
+        af: '@autoFilter',
         canAdd: '=', // must use = instead of @ for booleans
         canDelete: '=',
         canFilter: '=',

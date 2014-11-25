@@ -3,11 +3,23 @@
 <div ng-if="fields">
   <form ng-if="showForm" name="myForm">
     <div class="row" ng-repeat="field in fields">
-      <label>{{field.label}}</label>
-      <input class="form-control" type="{{getInputType(field)}}"
-        ng-model="field.value"
-        ng-readonly="isReadOnly(field, editObj)"
-        required>
+      <div ng-if="getInputType(field) === 'checkbox'" class="checkbox">
+        <label></label>
+        <label>
+          <input type="checkbox"
+            ng-model="field.value"
+            ng-readonly="isReadOnly(field, editObj)"
+            required>
+          {{field.label}}
+        </label>
+      </div>
+      <div ng-if="getInputType(field) !== 'checkbox'" class="form-group">
+        <label>{{field.label}}</label>
+        <input class="form-control" type="{{getInputType(field)}}"
+          ng-model="field.value"
+          ng-readonly="isReadOnly(field, editObj)"
+          required>
+      </div>
     </div>
   </form>
 
@@ -71,7 +83,7 @@
         <td class="manage-type-{{field.type}}"
           ng-repeat="field in fields"
           ng-if="!isHidden(field)">
-          {{obj[field.property]}}
+          {{getPropValue(obj, field)}}
         </td>
         <td ng-if="actionCount > 0">
           <button ng-if="canDelete" class="btn btn-default"

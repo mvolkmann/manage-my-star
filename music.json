@@ -14,13 +14,15 @@
   "6": {
     "artist": "Joanna Newsom",
     "title": "Have One On Us",
-    "rating": 4,
+    "rating": 5,
+    "own": true,
     "id": 6
   },
   "7": {
     "artist": "Modest Mouse",
     "title": "Building Nothing Out of Something",
     "rating": 4,
+    "own": true,
     "id": 7
   }
 }

@@ -14,6 +14,49 @@ app.use(express.static(rootDir));
 
 const filePath = rootDir + '/music.json';
 
+function applyFilter(arr, filter) {
+  return arr.filter(obj =>
+    Object.keys(filter).every(prop => {
+      let filterValue = filter[prop];
+      if (filterValue === null) return true;
+
+      let propValue = obj[prop];
+      let type = typeof filterValue;
+      if (propValue === undefined && type === 'boolean') propValue = false;
+
+      return type === 'string' ? propValue.contains(filterValue) :
+        type === 'number' ? propValue >= filterValue :
+        type === 'boolean' ? propValue === filterValue :
+        true; //TODO: don't know how to handle other types yet
+    }));
+}
+
+function convertType(value) {
+  let num = Number(value);
+  return value === 'true' ? true :
+    value === 'false' ? false :
+    !Number.isNaN(num) ? num :
+    value;
+}
+
+/**
+ * Creates an object from all the query parameters
+ * that start with a given prefix.
+ */
+function extractObject(req, prefix) {
+  let obj = {};
+
+  Object.keys(req.query).forEach(key => {
+    if (key.startsWith(prefix)) {
+      let prop = key.substring(prefix.length);
+      let value = req.query[key];
+      obj[prop] = convertType(value);
+    }
+  });
+
+  return obj;
+}
+
 function getHighestId(music) {
   return Object.keys(music).reduce(
     (highest, id) => Math.max(highest, Number(id)),
@@ -49,23 +92,17 @@ app['delete']('/album/:id', (req, res) => {
 
 app.get('/album', (req, res) => {
   // Get query parameters related to sorting.
-  var sortProp = req.query.sort;
-  var reverse = req.query.reverse === 'true';
+  let sortProp = req.query.sort;
+  let reverse = req.query.reverse === 'true';
 
   // Get query parameters related to filtering.
-  var filter = {};
-  var prefix = 'filter-';
-  Object.keys(req.query).forEach(key => {
-    if (key.startsWith(prefix)) {
-      var prop = key.substring(prefix.length);
-      filter[prop] = req.query[key];
-    }
-  });
+  let filter = extractObject(req, 'filter-');
+  let autoFilter = extractObject(req, 'af-');
 
   getMusic((err, music) => {
     // Create an array of albums.
-    var albums = Object.keys(music).map(id => {
-      var album = music[id];
+    let albums = Object.keys(music).map(id => {
+      let album = music[id];
       album.id = Number(id);
       return album;
     });
@@ -75,26 +112,17 @@ app.get('/album', (req, res) => {
     albums[1].readOnlyProps = ['rating'];
 
     // Filter out ones that aren't desired.
-    albums = albums.filter(album =>
-      Object.keys(filter).every(prop => {
-        var filterValue = filter[prop];
-        if (filterValue === null) return true;
-
-        var propValue = album[prop];
-        var type = typeof propValue;
-        return type === 'string' ? propValue.contains(filterValue) :
-          type === 'number' ? propValue >= filterValue :
-          true; //TODO: don't know how to handle other types yet
-      }));
+    albums = applyFilter(albums, autoFilter);
+    albums = applyFilter(albums, filter);
     //console.log('server.js GET /album: albums =', albums);
 
     if (sortProp) {
       // Sort the array of albums.
       albums.sort((left, right) => {
-        var leftValue = left[sortProp];
-        var rightValue = right[sortProp];
-        var leftType = typeof leftValue;
-        var compare =
+        let leftValue = left[sortProp];
+        let rightValue = right[sortProp];
+        let leftType = typeof leftValue;
+        let compare =
           leftType === 'string' ? leftValue.localeCompare(rightValue) :
           leftType === 'number' ? leftValue - rightValue :
           0; // don't know how to sort other types yet
@@ -152,7 +180,8 @@ app.get('/album-field', (req, res) => {
   const fields = [
     {label: 'Artist', property: 'artist', type: 'string', readOnly: true},
     {label: 'Title', property: 'title', type: 'string'},
-    {label: 'Rating', property: 'rating', type: 'number'}
+    {label: 'Rating', property: 'rating', type: 'number'},
+    {label: 'Own?', property: 'own', type: 'boolean'}
   ];
 
   res.set('Content-Type', 'application/json');
