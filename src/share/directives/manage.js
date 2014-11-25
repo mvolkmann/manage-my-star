@@ -38,7 +38,9 @@
         let url = '/' + resourceName +
           '?sort=' + sortProperty + '&reverse=' + reverse;
         Object.keys(filter).forEach(prop => {
-          url += '&filter-' + prop + '=' + filter[prop];
+          let value = filter[prop];
+          if (value === null) value = '';
+          url += '&filter-' + prop + '=' + value;
         });
         return $http.get(url);
       },

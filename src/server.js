@@ -70,10 +70,16 @@ app.get('/album', (req, res) => {
       return album;
     });
 
+    // For testing the ability to make certain properties of certain objects
+    // readonly, make one property of the second object readonly.
+    albums[1].readOnlyProps = ['rating'];
+
     // Filter out ones that aren't desired.
     albums = albums.filter(album =>
       Object.keys(filter).every(prop => {
         var filterValue = filter[prop];
+        if (filterValue === null) return true;
+
         var propValue = album[prop];
         var type = typeof propValue;
         return type === 'string' ? propValue.contains(filterValue) :
@@ -95,10 +101,6 @@ app.get('/album', (req, res) => {
         return reverse ? compare * -1 : compare;
       });
     }
-
-    // For testing the ability to make certain properties of certain objects
-    // readonly, make one property of the second object readonly.
-    albums[1].readOnlyProps = ['rating'];
 
     // Return the array of albums.
     res.set('Content-Type', 'application/json');
