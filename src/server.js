@@ -50,9 +50,7 @@ app['delete']('/album/:id', (req, res) => {
 app.get('/album', (req, res) => {
   // Get query parameters related to sorting.
   var sortProp = req.query.sort;
-  //console.log('server.js GET /album: sortProp =', sortProp);
   var reverse = req.query.reverse === 'true';
-  //console.log('server.js GET /album: reverse =', reverse);
 
   // Get query parameters related to filtering.
   var filter = {};
@@ -63,13 +61,12 @@ app.get('/album', (req, res) => {
       filter[prop] = req.query[key];
     }
   });
-  //console.log('server.js GET /album: filter =', filter);
 
   getMusic(function (err, music) {
     // Create an array of albums.
     var albums = Object.keys(music).map(id => {
       var album = music[id];
-      album.id = id;
+      album.id = Number(id);
       return album;
     });
 
@@ -98,6 +95,10 @@ app.get('/album', (req, res) => {
         return reverse ? compare * -1 : compare;
       });
     }
+
+    // For testing the ability to make certain properties of certain objects
+    // readonly, make one property of the second object readonly.
+    albums[1].readOnlyProps = ['rating'];
 
     // Return the array of albums.
     res.set('Content-Type', 'application/json');
@@ -147,7 +148,7 @@ app.put('/album/:id', (req, res) => {
 
 app.get('/album-field', (req, res) => {
   const fields = [
-    {label: 'Artist', property: 'artist', type: 'string', readonly: true},
+    {label: 'Artist', property: 'artist', type: 'string', readOnly: true},
     {label: 'Title', property: 'title', type: 'string'},
     {label: 'Rating', property: 'rating', type: 'number'}
   ];

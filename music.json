@@ -2,25 +2,25 @@
   "1": {
     "artist": "Jessica Hoop",
     "title": "Kismet",
-    "rating": "3",
-    "id": "1"
+    "rating": 3,
+    "id": 1
   },
   "5": {
     "artist": "Belly",
     "title": "Star",
-    "rating": "3",
+    "rating": 3,
     "id": 5
   },
   "6": {
     "artist": "Joanna Newsom",
-    "title": "Have One On Me",
-    "rating": "4",
+    "title": "Have One On Us",
+    "rating": 4,
     "id": 6
   },
   "7": {
     "artist": "Modest Mouse",
     "title": "Building Nothing Out of Something",
-    "rating": "4",
+    "rating": 3,
     "id": 7
   }
 }

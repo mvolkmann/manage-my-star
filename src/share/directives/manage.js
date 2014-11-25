@@ -16,6 +16,13 @@
     };
   }
 
+  // Temporary polyfill until Traceur adds this.
+  if (!Array.prototype.includes) {
+    Array.prototype.includes = function (value) {
+      return this.indexOf(value) !== -1;
+    };
+  }
+
   module.factory('manageSvc', ['$http', $http => {
     return {
       addObject(obj) {
@@ -149,7 +156,7 @@
     };
 
     $scope.clearForm = () => {
-      $scope.editId = null;
+      $scope.editObj = null;
       $scope.fields.forEach(field => field.value = null);
     };
 
@@ -176,7 +183,7 @@
 
     $scope.editObject = (index, obj) => {
       if (!$scope.canUpdate) return;
-      $scope.editId = obj.id;
+      $scope.editObj = obj;
       $scope.fields.forEach(field => field.value = obj[field.property]);
     };
 
@@ -200,6 +207,18 @@
       let right = offset.left + caret.width();
       let left = right - dialog.width();
       dialog.css({position: 'fixed', top: top, left: left});
+    };
+
+    $scope.getInputType = field => {
+      var type = field.type;
+      return type === 'number' ? 'number' : 'text';
+    };
+
+    $scope.isReadOnly = (field, obj) => {
+      if (!obj) return false;
+      if (field.readOnly) return true;
+      let rop = obj.readOnlyProps;
+      return rop && rop.includes(field.property);
     };
 
     $scope.notImplemented = () => handleError('Not implemented yet');
@@ -235,9 +254,12 @@
 
     $scope.updateObject = () => {
       let album = getObjectFromForm();
-      album.id = $scope.editId;
+      album.id = $scope.editObj.id;
       manageSvc.updateObject(album).then(
-        updateTable, // so new album is in sorted order
+        () => {
+          $scope.clearForm();
+          updateTable(); // so new album is in sorted order
+        },
         handleError);
     };
   }]);
