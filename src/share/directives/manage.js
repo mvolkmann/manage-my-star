@@ -272,6 +272,7 @@
       scope: {
         canAdd: '=', // must use = instead of @ for booleans
         canDelete: '=',
+        canFilter: '=',
         canUpdate: '=',
         resource: '@',
         sortProperty: '@',
