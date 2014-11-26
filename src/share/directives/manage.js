@@ -23,6 +23,15 @@
     };
   }
 
+  function convertType(value) {
+    let num = Number(value);
+    return value === 'true' ? true :
+      value === 'false' ? false :
+      typeof value === 'boolean' ? value :
+      !Number.isNaN(num) ? num :
+      value;
+  }
+
   module.factory('manageSvc', ['$http', $http => {
 
     function getFilterQueryParams(filter, prefix) {
@@ -49,7 +58,25 @@
         if (reverse) url += '&reverse=' + reverse;
         url += getFilterQueryParams(autoFilter, 'af');
         url += getFilterQueryParams(filter, 'filter');
-        //console.log('manage.js getObjects: url =', url);
+        return $http.get(url);
+      },
+      getSearches() {
+        return $http.get('/' + resourceName + '-search');
+      },
+      search(fields) {
+        let url = '/' + resourceName;
+        let delimiter = '?';
+        fields.forEach((field, index) => {
+          var value = field.value;
+          console.log('manage.js search: value =', value);
+          console.log('manage.js search: typeof value =', typeof value);
+          if (value || value === 0 || value === false) {
+            url += delimiter + 'filter-' + field.property + '=' +
+              convertType(value);
+            delimiter = '&';
+          }
+        });
+        console.log('manage.js search: url =', url);
         return $http.get(url);
       },
       updateObject(obj) {
@@ -110,14 +137,6 @@
 
     let filterModal;
 
-    function convertType(value) {
-      let num = Number(value);
-      return value === 'true' ? true :
-        value === 'false' ? false :
-        !Number.isNaN(num) ? num :
-        value;
-    }
-
     function getAutoFilter() {
       let filter = {};
       if ($scope.af) {
@@ -155,6 +174,9 @@
 
     resourceName = $scope.resource;
     $scope.autoFilter = getAutoFilter();
+
+    manageSvc.getSearches().then(
+      res => $scope.searches = res.data);
 
     manageSvc.getFields().then(
       res => {
@@ -265,6 +287,13 @@
     };
 
     $scope.notImplemented = () => handleError('Not implemented yet');
+
+    $scope.search = (fields) => {
+      console.log('manage.js search: fields =', fields);
+      manageSvc.search(fields).then(
+        res => $scope.objects = res.data,
+        res => handleError(res.data));
+    };
 
     $scope.sortOn = field => {
       $scope.reverse = field === $scope.sortField && !$scope.reverse;

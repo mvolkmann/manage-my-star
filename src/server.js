@@ -14,6 +14,8 @@ app.use(express.static(rootDir));
 
 const filePath = rootDir + '/music.json';
 
+let fieldMap = getFieldMap();
+
 function applyFilter(arr, filter) {
   return arr.filter(obj =>
     Object.keys(filter).every(prop => {
@@ -35,6 +37,7 @@ function convertType(value) {
   let num = Number(value);
   return value === 'true' ? true :
     value === 'false' ? false :
+    typeof value === 'boolean' ? value :
     !Number.isNaN(num) ? num :
     value;
 }
@@ -71,11 +74,33 @@ function getMusic(cb) {
   });
 }
 
+function getFieldMap() {
+  var map = {};
+
+  function addField(property, type, label, readOnly = false) {
+    if (!label) label = propertyToLabel(property);
+    map[property] = {property, type, label, readOnly};
+  }
+
+  addField('artist', 'string', 'Artist', true);
+  addField('title', 'string');
+  addField('rating', 'number');
+  addField('own', 'boolean', 'Own?');
+
+  return map;
+}
+
+function propertyToLabel(property) {
+  var s = property.charAt(0).toUpperCase() + property.substring(1);
+  return s.replace(/([A-Z])/g, ' $1');
+}
+
 function saveMusic(music, cb) {
   let json = JSON.stringify(music, null, 2);
   fs.writeFile(filePath, json, cb);
 }
 
+// Deletes a specific album.
 app['delete']('/album/:id', (req, res) => {
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
@@ -90,6 +115,7 @@ app['delete']('/album/:id', (req, res) => {
   });
 });
 
+// Gets an array of all albums that match the supplied, optional filters.
 app.get('/album', (req, res) => {
   // Get query parameters related to sorting.
   let sortProp = req.query.sort;
@@ -136,6 +162,7 @@ app.get('/album', (req, res) => {
   });
 });
 
+// Gets a specific album.
 app.get('/album/:id', (req, res) => {
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
@@ -176,16 +203,27 @@ app.put('/album/:id', (req, res) => {
   });
 });
 
+// Gets the UI "fields" for the "album" resource type.
 app.get('/album-field', (req, res) => {
   const fields = [
-    {label: 'Artist', property: 'artist', type: 'string', readOnly: true},
-    {label: 'Title', property: 'title', type: 'string'},
-    {label: 'Rating', property: 'rating', type: 'number'},
-    {label: 'Own?', property: 'own', type: 'boolean'}
+    fieldMap.artist, fieldMap.title, fieldMap.rating, fieldMap.own
   ];
 
   res.set('Content-Type', 'application/json');
   res.end(JSON.stringify(fields));
+});
+
+
+// Gets the UI "searches" for the "album" resource type.
+app.get('/album-search', (req, res) => {
+  const searches = [
+    [fieldMap.artist, fieldMap.title],
+    [fieldMap.rating],
+    [fieldMap.own]
+  ];
+
+  res.set('Content-Type', 'application/json');
+  res.end(JSON.stringify(searches));
 });
 
 const PORT = 3000;

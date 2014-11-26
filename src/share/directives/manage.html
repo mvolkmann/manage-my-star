@@ -1,9 +1,22 @@
+<div class="searches">
+  <label>Search</label>
+  <div ng-repeat="fields in searches" class="form-group row">
+    <span ng-repeat="field in fields">
+      <label>{{field.label}}</label>
+      <input class="form-control" type="{{getInputType(field)}}"
+        ng-model="field.value">
+    </span>
+    <span class="glyphicon glyphicon-search" ng-click="search(fields)"></span>
+  </div>
+</div>
+<hr>
+
 <!-- Don't display anything until the fields
      have been retrieved from the server. -->
 <div ng-if="fields">
   <form ng-if="showForm" name="myForm">
     <div class="row" ng-repeat="field in fields">
-      <div ng-if="getInputType(field) === 'checkbox'" class="checkbox">
+      <!--div ng-if="getInputType(field) === 'checkbox'" class="checkbox">
         <label></label>
         <label>
           <input type="checkbox"
@@ -14,6 +27,13 @@
         </label>
       </div>
       <div ng-if="getInputType(field) !== 'checkbox'" class="form-group">
+        <label>{{field.label}}</label>
+        <input class="form-control" type="{{getInputType(field)}}"
+          ng-model="field.value"
+          ng-readonly="isReadOnly(field, editObj)"
+          required>
+      </div-->
+      <div class="form-group">
         <label>{{field.label}}</label>
         <input class="form-control" type="{{getInputType(field)}}"
           ng-model="field.value"
@@ -38,6 +58,7 @@
       ng-disabled="!editObj || myForm.$invalid">
       Update
     </button>
+    <span>Click in a table row to edit it using the fields above.</span>
   </div>
 
   <table class="manage-table-head">

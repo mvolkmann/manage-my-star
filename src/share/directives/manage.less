@@ -1,6 +1,7 @@
 @cell-width: 200px;
 @label-width: 70px;
 @table-width: 600px; // 100%;
+@scrollbar-width: 0; // in Windows this should be 16px
 
 body {
   font-family: sans-serif;
@@ -62,7 +63,7 @@ th {
   display: block;
   overflow: scroll;
   position: relative;
-  width: @table-width;
+  width: @table-width + @scrollbar-width; // Theron modified
   height: 200px;
 }
 
@@ -96,5 +97,16 @@ th {
 
   .form-group {
     margin-bottom: 10px;
+  }
+}
+
+.searches {
+  input {
+    display: inline-block;
+    width: auto;
+  }
+
+  .glyphicon {
+    margin-left: 15px;
   }
 }
