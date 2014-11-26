@@ -58,7 +58,7 @@
       }) {
         let url = '/' + resourceName + '?sort=' + sortField.property;
         if (reverse) url += '&reverse=' + reverse;
-        if (startIndex) url += '&start=' + startIndex;
+        if (startIndex !== undefined) url += '&start=' + startIndex;
         if (pageSize) url += '&size=' + pageSize;
         url += getFilterQueryParams(autoFilter, 'af');
         url += getFilterQueryParams(filter, 'filter');
@@ -166,13 +166,17 @@
 
     function updateTable() {
       manageSvc.getObjects($scope).then(
-        res => $scope.objects = res.data,
+        res => {
+          $scope.objectCount = res.headers()['x-array-size'];
+          $scope.endIndex = Math.min(
+            $scope.startIndex + $scope.pageSize, $scope.objectCount);
+          $scope.objects = res.data;
+        },
         res => handleError(res.data));
     }
 
-    //TODO: This is just to test paging.
-    //$scope.startIndex = 1;
-    //$scope.pageSize = 2;
+    // This is for paging.
+    $scope.startIndex = 0;
 
     resourceName = $scope.resource;
     $scope.autoFilter = getAutoFilter();
@@ -272,12 +276,38 @@
         'text';
     };
 
+    $scope.getFirstPage = () => {
+      $scope.startIndex = 0;
+      updateTable();
+    };
+
+    $scope.getLastPage = () => {
+      var ps = $scope.pageSize;
+      $scope.startIndex = Math.floor($scope.objectCount / ps) * ps;
+      updateTable();
+    };
+
+    $scope.getNextPage = () => {
+      $scope.startIndex += $scope.pageSize;
+      updateTable();
+    };
+
+    $scope.getPreviousPage = () => {
+      $scope.startIndex -= $scope.pageSize;
+      updateTable();
+    };
+
     $scope.getPropValue = (obj, field) => {
       let value = obj[field.property];
       let type = field.type;
       if (type === 'boolean' && !value) value = false;
       return value;
     };
+
+    $scope.hasNextPage = () =>
+      $scope.startIndex + $scope.pageSize < $scope.objectCount;
+
+    $scope.hasPreviousPage = () => $scope.startIndex > 0;
 
     $scope.isHidden = field => $scope.hiddenProps.includes(field.property);
 
@@ -349,6 +379,7 @@
         hideProps: '@', // comma-separated list of property names
         resource: '@',
         sortProperty: '@',
+        pageSize: '=', // must use = instead of @ for numbers
         objToStr: '='
       },
       controller: 'ManageCtrl',

@@ -116,7 +116,9 @@ app['delete']('/album/:id', (req, res) => {
   });
 });
 
-// Gets an array of all albums that match the supplied, optional filters.
+// Gets an array of all albums that match
+// the supplied, optional filters and
+// are in the bounds of the optional page range.
 app.get('/album', (req, res) => {
   // Get query parameters related to paging.
   let startIndex = Number(req.query.start);
@@ -147,6 +149,9 @@ app.get('/album', (req, res) => {
     albums = applyFilter(albums, filter);
     //console.log('server.js GET /album: albums =', albums);
 
+    // This must be done AFTER filtering!
+    let arraySize = albums.length;
+
     if (sortProp) {
       // Sort the array of albums.
       albums.sort((left, right) => {
@@ -169,6 +174,7 @@ app.get('/album', (req, res) => {
 
     // Return the array of albums.
     res.set('Content-Type', 'application/json');
+    res.set('x-array-size', arraySize);
     res.end(JSON.stringify(albums));
   });
 });

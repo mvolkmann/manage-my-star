@@ -24,5 +24,26 @@
     "rating": 4,
     "own": true,
     "id": 7
+  },
+  "8": {
+    "artist": "The Cure",
+    "title": "Kiss Me, Kiss Me, Kiss Me",
+    "rating": 5,
+    "own": true,
+    "id": 8
+  },
+  "9": {
+    "artist": "The Smiths",
+    "title": "Louder Than Bombs",
+    "rating": 5,
+    "own": true,
+    "id": 9
+  },
+  "10": {
+    "artist": "Sugarcubes",
+    "title": "Life's Too Good",
+    "rating": 4,
+    "own": true,
+    "id": 10
   }
 }

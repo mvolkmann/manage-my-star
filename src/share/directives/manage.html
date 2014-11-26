@@ -63,6 +63,32 @@
     <span>Click in a table row to edit it using the fields above.</span>
   </div>
 
+  <div class="pagination">
+    Showing {{startIndex + 1}} to {{endIndex}} of {{objectCount}}
+    <button class="btn btn-default"
+      ng-disabled="!hasPreviousPage()"
+      ng-click="getFirstPage()">
+      <span class="glyphicon glyphicon-fast-backward"></span>
+    </button>
+    <button class="btn btn-default"
+      ng-disabled="!hasPreviousPage()"
+      ng-click="getPreviousPage()">
+      <span class="glyphicon glyphicon-backward"></span>
+      Previous
+    </button>
+    <button class="btn btn-default"
+      ng-disabled="!hasNextPage()"
+      ng-click="getNextPage()">
+      Next
+      <span class="glyphicon glyphicon-forward"></span>
+    </button>
+    <button class="btn btn-default"
+      ng-disabled="!hasNextPage()"
+      ng-click="getLastPage()">
+      <span class="glyphicon glyphicon-fast-forward"></span>
+    </button>
+  </div>
+
   <table class="manage-table-head">
     <thead>
       <tr>
