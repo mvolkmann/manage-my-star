@@ -52,10 +52,11 @@
       getFields() {
         return $http.get('/' + resourceName + '-field');
       },
-      getObjects(
-        sortProperty, reverse, autoFilter, filter, startIndex, pageSize) {
-
-        let url = '/' + resourceName + '?sort=' + sortProperty;
+      getObjects({sortField, reverse, // using destructuring
+        autoFilter, filter,
+        startIndex, pageSize
+      }) {
+        let url = '/' + resourceName + '?sort=' + sortField.property;
         if (reverse) url += '&reverse=' + reverse;
         if (startIndex) url += '&start=' + startIndex;
         if (pageSize) url += '&size=' + pageSize;
@@ -164,13 +165,7 @@
     }
 
     function updateTable() {
-      manageSvc.getObjects(
-        $scope.sortField.property,
-        $scope.reverse,
-        $scope.autoFilter,
-        $scope.filter,
-        $scope.startIndex,
-        $scope.pageSize).then(
+      manageSvc.getObjects($scope).then(
         res => $scope.objects = res.data,
         res => handleError(res.data));
     }
