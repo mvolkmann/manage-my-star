@@ -1,9 +1,10 @@
 <div class="searches">
-  <label>Search</label>
+  <h4>Search</h4>
   <div ng-repeat="fields in searches" class="form-group row">
     <span ng-repeat="field in fields">
       <label>{{field.label}}</label>
-      <input class="form-control" type="{{getInputType(field)}}"
+      <input ng-class="field.type === 'boolean' ? '' : 'form-control'"
+        type="{{getInputType(field)}}"
         ng-model="field.value">
     </span>
     <span class="glyphicon glyphicon-search" ng-click="search(fields)"></span>
@@ -35,7 +36,8 @@
       </div-->
       <div class="form-group">
         <label>{{field.label}}</label>
-        <input class="form-control" type="{{getInputType(field)}}"
+        <input ng-class="field.type === 'boolean' ? '' : 'form-control'"
+          type="{{getInputType(field)}}"
           ng-model="field.value"
           ng-readonly="isReadOnly(field, editObj)"
           required>

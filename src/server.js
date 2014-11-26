@@ -80,6 +80,7 @@ function getFieldMap() {
   function addField(property, type, label, readOnly = false) {
     if (!label) label = propertyToLabel(property);
     map[property] = {property, type, label, readOnly};
+    if (type === 'boolean') map[property].value = false;
   }
 
   addField('artist', 'string', 'Artist', true);
