@@ -52,9 +52,13 @@
       getFields() {
         return $http.get('/' + resourceName + '-field');
       },
-      getObjects(sortProperty, reverse, autoFilter, filter) {
+      getObjects(
+        sortProperty, reverse, autoFilter, filter, startIndex, pageSize) {
+
         let url = '/' + resourceName + '?sort=' + sortProperty;
         if (reverse) url += '&reverse=' + reverse;
+        if (startIndex) url += '&start=' + startIndex;
+        if (pageSize) url += '&size=' + pageSize;
         url += getFilterQueryParams(autoFilter, 'af');
         url += getFilterQueryParams(filter, 'filter');
         return $http.get(url);
@@ -164,10 +168,16 @@
         $scope.sortField.property,
         $scope.reverse,
         $scope.autoFilter,
-        $scope.filter).then(
+        $scope.filter,
+        $scope.startIndex,
+        $scope.pageSize).then(
         res => $scope.objects = res.data,
         res => handleError(res.data));
     }
+
+    //TODO: This is just to test paging.
+    //$scope.startIndex = 1;
+    //$scope.pageSize = 2;
 
     resourceName = $scope.resource;
     $scope.autoFilter = getAutoFilter();

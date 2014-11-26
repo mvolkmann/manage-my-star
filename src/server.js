@@ -118,6 +118,10 @@ app['delete']('/album/:id', (req, res) => {
 
 // Gets an array of all albums that match the supplied, optional filters.
 app.get('/album', (req, res) => {
+  // Get query parameters related to paging.
+  let startIndex = Number(req.query.start);
+  let pageSize = Number(req.query.size);
+
   // Get query parameters related to sorting.
   let sortProp = req.query.sort;
   let reverse = req.query.reverse === 'true';
@@ -155,6 +159,12 @@ app.get('/album', (req, res) => {
           0; // don't know how to sort other types yet
         return reverse ? compare * -1 : compare;
       });
+    }
+
+    if (startIndex !== undefined) {
+      // Filter out ones outside the requested "page".
+      let endIndex = pageSize ? startIndex + pageSize : undefined;
+      albums = albums.slice(startIndex, endIndex);
     }
 
     // Return the array of albums.
