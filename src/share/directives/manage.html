@@ -63,7 +63,7 @@
     <span>Click in a table row to edit it using the fields above.</span>
   </div>
 
-  <div class="pagination">
+  <div class="pagination" ng-hide="objectCount <= pageSize">
     Showing {{startIndex + 1}} to {{endIndex}} of {{objectCount}}
     <button class="btn btn-default"
       ng-disabled="!hasPreviousPage()"
