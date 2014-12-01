@@ -33,12 +33,12 @@ function convertType(value) {
 }
 
 myModule.factory('manageSvc', ['$http', $http => {
-  function getFilterQueryParams(filter, prefix) {
+  function getFilterQueryParams(filters, prefix) {
     let s = '';
-    if (filter) {
-      Object.keys(filter).forEach(prop => {
-        let value = filter[prop];
-        if (value) s += '&' + prefix + '-' + prop + '=' + value;
+    if (filters) {
+      Object.keys(filters).forEach(prop => {
+        let value = filters[prop];
+        if (value !== undefined) s += '&' + prefix + '-' + prop + '=' + value;
       });
     }
     return s;
@@ -55,44 +55,21 @@ myModule.factory('manageSvc', ['$http', $http => {
       return $http.get('/' + resourceName + '-field');
     },
     getObjects({sortField, reverse, // using destructuring
-      autoFilter, filter,
+      autoFilters, filters,
       startIndex, pageSize
     }) {
       let url = '/' + resourceName + '?sort=' + sortField.property;
       if (reverse) url += '&reverse=' + reverse;
       if (startIndex !== undefined) url += '&start=' + startIndex;
       if (pageSize) url += '&size=' + pageSize;
-      url += getFilterQueryParams(autoFilter, 'af');
-      url += getFilterQueryParams(filter, 'filter');
+      url += getFilterQueryParams(autoFilters, 'af');
+      url += getFilterQueryParams(filters, 'filter');
       //console.log('manage.js getObjects: url =', url);
       return $http.get(url);
     },
     getSearches() {
       return $http.get('/' + resourceName + '-search');
     },
-    /*
-    search(fields, pageSize) {
-      let url = '/' + resourceName;
-      let delimiter = '?';
-
-      if (pageSize) {
-        url += delimiter + 'size=' + pageSize;
-        delimiter = '&';
-      }
-
-      fields.forEach((field, index) => {
-        var value = field.value;
-        if (value || value === 0 || value === false) {
-          url += delimiter + 'filter-' + field.property + '=' +
-            convertType(value);
-          delimiter = '&';
-        }
-      });
-
-      //console.log('manage.js search: url =', url);
-      return $http.get(url);
-    },
-    */
     toString(id) {
       let config = {headers: {Accept: 'text/plain'}};
       return $http.get('/' + resourceName + '/' + id, config);
@@ -156,21 +133,21 @@ myModule.controller('ManageCtrl', [
   let filterModal;
 
   function clearFilters() {
-    let filter = $scope.filter;
-    Object.keys(filter).forEach(prop => delete filter[prop]);
+    let filters = $scope.filters;
+    Object.keys(filters).forEach(prop => delete filters[prop]);
   }
 
-  function getAutoFilter() {
-    let filter = {};
+  function getAutoFilters() {
+    let filters = {};
     if ($scope.af) {
       $scope.af.split(',').forEach(s => {
         let [name, value] = s.split('=');
         name = name.trim();
         value = value.trim();
-        filter[name] = convertType(value);
+        filters[name] = convertType(value);
       });
     }
-    return filter;
+    return filters;
   }
 
   function getInputType(field) {
@@ -214,7 +191,9 @@ myModule.controller('ManageCtrl', [
   $scope.startIndex = 0;
 
   resourceName = $scope.resource;
-  $scope.autoFilter = getAutoFilter();
+  $scope.autoFilters = getAutoFilters();
+  $scope.filters = {};
+
 
   manageSvc.getSearches().then(res => {
     let searches = res.data;
@@ -245,7 +224,6 @@ myModule.controller('ManageCtrl', [
   };
 
   $scope.applyFilter = () => {
-    //$scope.filter.text = '';
     //filterModal.close();
     updateTable();
   };
@@ -356,16 +334,16 @@ myModule.controller('ManageCtrl', [
   $scope.search = (fields) => {
     // Copy search criteria into filters.
     clearFilters();
-    let filter = $scope.filter;
+    let filters = $scope.filters;
     fields.forEach(field => {
-      filter[field.property] = field.value;
+      filters[field.property] = field.value;
     });
 
-    // Copy relevant properties from scope, except autoFilter.
+    // Copy relevant properties from scope, except autoFilters.
     let config = {
       sortField: $scope.sortField,
       reverse: $scope.reverse,
-      filter: $scope.filter,
+      filters: filters,
       startIndex: $scope.startIndex,
       pageSize: $scope.pageSize
     };
@@ -420,7 +398,7 @@ myModule.directive('manageMyStar', () => {
   return {
     restrict: 'AE',
     scope: {
-      af: '@autoFilter',
+      af: '@autoFilters',
       canAdd: '=', // must use = instead of @ for booleans
       canDelete: '=',
       canFilter: '=',
