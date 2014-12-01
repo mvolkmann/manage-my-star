@@ -7,7 +7,6 @@ String.prototype.includes = String.prototype.contains;
 let bodyParser = require('body-parser');
 let express = require('express');
 let fs = require('fs');
-const SUCCESS = 200;
 
 let app = express();
 app.use(bodyParser.json());
