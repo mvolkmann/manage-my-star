@@ -38,7 +38,9 @@ myModule.factory('manageSvc', ['$http', $http => {
     if (filters) {
       Object.keys(filters).forEach(prop => {
         let value = filters[prop];
-        if (value !== undefined) s += '&' + prefix + '-' + prop + '=' + value;
+        if (value || value === false) {
+          s += '&' + prefix + '-' + prop + '=' + value;
+        }
       });
     }
     return s;
