@@ -28,10 +28,11 @@
           ng-class="field.type === 'boolean' ? '' : 'form-control'"
           type="{{field.inputType}}"
           ng-model="field.value"
-          ng-readonly="isReadOnly(field, editObj)"
+          ng-disabled="isReadOnly(field, editObj)"
           required>
         <select ng-if="field.inputType === 'select'" class="form-control"
-          ng-model="field.value">
+          ng-model="field.value"
+          ng-disabled="isReadOnly(field, editObj)">
           <option ng-repeat="option in field.options">{{option}}</option>
         </select>
       </div>

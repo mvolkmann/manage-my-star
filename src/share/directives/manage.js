@@ -345,6 +345,7 @@ myModule.controller('ManageCtrl', [
 
   $scope.isReadOnly = (field, obj) => {
     if (!obj) return false;
+    if (obj._readOnly) return true; // all fields are read-only
     if (field.readOnly) return true;
     let rop = obj.readOnlyProps;
     return rop && rop.includes(field.property);

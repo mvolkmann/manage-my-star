@@ -212,6 +212,9 @@ app.get('/album', (req, res) => {
       albums = albums.slice(startIndex, endIndex);
     }
 
+    // Make the first album read-only to test that features.
+    if (albums.length > 0) albums[0]._readOnly = true;
+
     // Return the array of albums.
     res.set('Content-Type', 'application/json');
     res.set('x-array-size', arraySize);
