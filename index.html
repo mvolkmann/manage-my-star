@@ -24,7 +24,7 @@
     <script src="build/music/main.js"></script>
   </head>
   <body>
-    <div manage-my-star ng-controller="MusicCtrl"
+    <div manage-my-star
       resource="album"
       sort-property="title"
       can-add="true"
@@ -32,8 +32,7 @@
       can-filter="true"
       can-update="true"
       hide-props="own"
-      page-size=3
-      obj-to-str="albumToString">
+      page-size=3>
       <!--auto-filter="own=true"-->
       <!--auto-filter="own=true,rating=4,artist=J"-->
     </div>

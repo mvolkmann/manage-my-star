@@ -1,10 +1,4 @@
-(() => {
-  'use strict';
+'use strict';
+/*global angular: false */
 
-  var module = angular.module('Music', ['mtz-share', 'mtz-directives']);
-
-  module.controller('MusicCtrl', ['$scope', $scope => {
-    $scope.albumToString = album =>
-      'the album "' + album.title + '" by "' + album.artist + '"';
-  }]);
-})();
+angular.module('Music', ['mtz-share', 'mtz-directives']);

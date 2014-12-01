@@ -2,6 +2,8 @@
 /*global __dirname: true */
 
 require('../lib/traceur-runtime');
+String.prototype.includes = String.prototype.contains;
+
 let bodyParser = require('body-parser');
 let express = require('express');
 let fs = require('fs');
@@ -101,7 +103,9 @@ function saveMusic(music, cb) {
   fs.writeFile(filePath, json, cb);
 }
 
-// Deletes a specific album.
+/**
+ * Deletes a specific album.
+ */
 app['delete']('/album/:id', (req, res) => {
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
@@ -116,9 +120,11 @@ app['delete']('/album/:id', (req, res) => {
   });
 });
 
-// Gets an array of all albums that match
-// the supplied, optional filters and
-// are in the bounds of the optional page range.
+/**
+ * Gets an array of all albums that match
+ * the supplied, optional filters and
+ * are in the bounds of the optional page range.
+ */
 app.get('/album', (req, res) => {
   // Get query parameters related to paging.
   let startIndex = Number(req.query.start);
@@ -179,18 +185,49 @@ app.get('/album', (req, res) => {
   });
 });
 
-// Gets a specific album.
+/**
+ * Gets a specific album.
+ * When the request header Accept contains application/json,
+ * JSON is returned.
+ * When the request header Accept contains text/plain,
+ * a string description is returned.
+ * No other content types are currently supported.
+ */
 app.get('/album/:id', (req, res) => {
+  var accept = req.headers.accept;
+
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
 
-    res.set('Content-Type', 'application/json');
-    const id = req.params.id;
-    res.end(JSON.stringify(music[id]));
+    let contentType =
+      accept.includes('application/json') ? 'application/json' :
+      accept.includes('text/plain') ? 'text/plain' :
+      null;
+
+    if (contentType) {
+      res.set('Content-Type', contentType);
+
+      const id = req.params.id;
+      let album = music[id];
+
+      if (contentType === 'application/json') {
+        res.end(JSON.stringify(album));
+      } else if (contentType === 'text/plain') {
+        var string = 'the album "' + album.title +
+          '" by "' + album.artist + '"';
+        res.end(string);
+      } else {
+        res.status(500).end('unhandled Accept header "' + accept + '"');
+      }
+    } else {
+      res.status(400).end('unsupported Accept header "' + accept + '"');
+    }
   });
 });
 
-// Adds a new album.
+/**
+ * Adds a new album.
+ */
 app.post('/album', (req, res) => {
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
@@ -205,7 +242,9 @@ app.post('/album', (req, res) => {
   });
 });
 
-// Updates an existing album.
+/**
+ * Updates an existing album.
+ */
 app.put('/album/:id', (req, res) => {
   getMusic((err, music) => {
     if (err) return res.status(500).end(err);
@@ -220,7 +259,9 @@ app.put('/album/:id', (req, res) => {
   });
 });
 
-// Gets the UI "fields" for the "album" resource type.
+/**
+ * Gets the UI "fields" for the "album" resource type.
+ */
 app.get('/album-field', (req, res) => {
   const fields = [
     fieldMap.artist, fieldMap.title, fieldMap.rating, fieldMap.own
@@ -231,7 +272,9 @@ app.get('/album-field', (req, res) => {
 });
 
 
-// Gets the UI "searches" for the "album" resource type.
+/**
+ * Gets the UI "searches" for the "album" resource type.
+ */
 app.get('/album-search', (req, res) => {
   const searches = [
     [fieldMap.artist, fieldMap.title],
