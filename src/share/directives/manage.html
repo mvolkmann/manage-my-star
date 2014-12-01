@@ -110,11 +110,17 @@
               </ul>
             </span>
           </div>
-          <input ng-if="canFilter"
+          <input ng-if="canFilter && field.inputType !== 'select'"
             class="filter form-control"
             type="{{field.inputType}}"
             ng-model="filters[field.property]"
             ng-change="applyFilter()">
+          <select ng-if="canFilter && field.inputType === 'select'"
+            class="filter form-control"
+            ng-model="filters[field.property]"
+            ng-change="applyFilter()">
+            <option ng-repeat="option in field.options">{{option}}</option>
+          </select>
         </th>
         <th><div>Actions</div></th>
       </tr>
