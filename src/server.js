@@ -79,7 +79,6 @@ function getFieldMap() {
   addField({
     property: 'artist',
     type: 'string',
-    label: 'Artist',
     readOnly: true
   });
 
