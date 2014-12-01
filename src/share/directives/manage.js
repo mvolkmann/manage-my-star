@@ -196,6 +196,20 @@ myModule.controller('ManageCtrl', [
   $scope.autoFilters = getAutoFilters();
   $scope.filters = {};
 
+  // Manage accordions.
+  $scope.accordionStates = {managing: true, searching: false};
+  let savedObjects;
+  $scope.$watchCollection('accordionStates', states => {
+    //console.log('manage.js: states =', states);
+    if (!states.managing && $scope.objects && $scope.objects.length) {
+      savedObjects = $scope.objects;
+      $scope.objectCount = 0;
+      $scope.objects = [];
+    } else if (!states.searching && savedObjects) {
+      $scope.objectCount = savedObjects.length;
+      $scope.objects = savedObjects;
+    }
+  });
 
   manageSvc.getSearches().then(res => {
     let searches = res.data;

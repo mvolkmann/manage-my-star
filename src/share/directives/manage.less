@@ -1,5 +1,7 @@
 @cell-width: 200px;
 @label-width: 70px;
+@manage-color: LemonChiffon;
+@search-color: Wheat;
 @table-width: 600px; // 100%;
 @scrollbar-width: 0; // in Windows this should be 16px
 
@@ -22,7 +24,6 @@ td, th {
 }
 
 th {
-  background-color: LightSalmon;
   div {
     font-size: 14pt;
     font-weight: bold;
@@ -30,6 +31,14 @@ th {
   input {
     width: 50px;
   }
+}
+
+#manage-accordion .panel-heading {
+  background-color: @manage-color;
+}
+
+#search-accordion .panel-heading {
+  background-color: @search-color;
 }
 
 /* Overriding the Bootstrap caret class to make it bigger. */
@@ -78,6 +87,10 @@ th {
 .manage-type-string {
 }
 
+.managing {
+  background-color: @manage-color;
+}
+
 .pagination {
   margin: 10px 0 0 0;
 }
@@ -122,4 +135,8 @@ th {
   .glyphicon {
     margin-left: 15px;
   }
+}
+
+.searching {
+  background-color: @search-color
 }
