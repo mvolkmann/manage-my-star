@@ -7,10 +7,9 @@
         ng-class="field.type === 'boolean' ? '' : 'form-control'"
         type="{{field.inputType}}"
         ng-model="field.value">
-      <select ng-if="field.inputType === 'select'" class="form-control">
-        <option ng-repeat="option in field.options">
-          {{option}}
-        </option>
+      <select ng-if="field.inputType === 'select'" class="form-control"
+        ng-model="field.value">
+        <option ng-repeat="option in field.options">{{option}}</option>
       </select>
     </span>
     <span class="glyphicon glyphicon-search" ng-click="search(fields)"></span>
@@ -31,10 +30,9 @@
           ng-model="field.value"
           ng-readonly="isReadOnly(field, editObj)"
           required>
-        <select ng-if="field.inputType === 'select'" class="form-control">
-          <option ng-repeat="option in field.options">
-            {{option}}
-          </option>
+        <select ng-if="field.inputType === 'select'" class="form-control"
+          ng-model="field.value">
+          <option ng-repeat="option in field.options">{{option}}</option>
         </select>
       </div>
     </div>

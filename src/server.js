@@ -28,10 +28,12 @@ function applyFilter(arr, filter) {
       let type = typeof filterValue;
       if (propValue === undefined && type === 'boolean') propValue = false;
 
-      return type === 'string' ? propValue.contains(filterValue) :
+      let keep =
+        type === 'string' ? propValue.includes(filterValue) :
         type === 'number' ? propValue >= filterValue :
         type === 'boolean' ? propValue === filterValue :
         true; //TODO: don't know how to handle other types yet
+      return keep;
     }));
 }
 
@@ -60,20 +62,6 @@ function extractObject(req, prefix) {
   });
 
   return obj;
-}
-
-function getHighestId(music) {
-  return Object.keys(music).reduce(
-    (highest, id) => Math.max(highest, Number(id)),
-    0);
-}
-
-function getMusic(cb) {
-  fs.readFile(filePath, {encoding: 'utf8'}, (err, data) => {
-    if (err) return cb(err);
-
-    cb(null, JSON.parse(data));
-  });
 }
 
 function getFieldMap() {
@@ -120,6 +108,26 @@ function getFieldMap() {
   return map;
 }
 
+function getHighestId(music) {
+  return Object.keys(music).reduce(
+    (highest, id) => Math.max(highest, Number(id)),
+    0);
+}
+
+function getMusic(cb) {
+  fs.readFile(filePath, {encoding: 'utf8'}, (err, data) => {
+    if (err) return cb(err);
+
+    cb(null, JSON.parse(data));
+  });
+}
+
+function getNumericQueryParam(req, name) {
+  let value = req.query[name];
+  if (value) value = Number(value);
+  return value;
+}
+
 function propertyToLabel(property) {
   var s = property.charAt(0).toUpperCase() + property.substring(1);
   return s.replace(/([A-Z])/g, ' $1');
@@ -154,8 +162,8 @@ app['delete']('/album/:id', (req, res) => {
  */
 app.get('/album', (req, res) => {
   // Get query parameters related to paging.
-  let startIndex = Number(req.query.start);
-  let pageSize = Number(req.query.size);
+  let startIndex = getNumericQueryParam(req, 'start');
+  let pageSize = getNumericQueryParam(req, 'size');
 
   // Get query parameters related to sorting.
   let sortProp = req.query.sort;
@@ -180,7 +188,6 @@ app.get('/album', (req, res) => {
     // Filter out ones that aren't desired.
     albums = applyFilter(albums, autoFilter);
     albums = applyFilter(albums, filter);
-    //console.log('server.js GET /album: albums =', albums);
 
     // This must be done AFTER filtering!
     let arraySize = albums.length;

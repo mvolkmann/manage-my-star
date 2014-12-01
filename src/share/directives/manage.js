@@ -35,10 +35,12 @@ function convertType(value) {
 myModule.factory('manageSvc', ['$http', $http => {
   function getFilterQueryParams(filter, prefix) {
     let s = '';
-    Object.keys(filter).forEach(prop => {
-      let value = filter[prop];
-      if (value) s += '&' + prefix + '-' + prop + '=' + value;
-    });
+    if (filter) {
+      Object.keys(filter).forEach(prop => {
+        let value = filter[prop];
+        if (value) s += '&' + prefix + '-' + prop + '=' + value;
+      });
+    }
     return s;
   }
 
@@ -62,14 +64,22 @@ myModule.factory('manageSvc', ['$http', $http => {
       if (pageSize) url += '&size=' + pageSize;
       url += getFilterQueryParams(autoFilter, 'af');
       url += getFilterQueryParams(filter, 'filter');
+      //console.log('manage.js getObjects: url =', url);
       return $http.get(url);
     },
     getSearches() {
       return $http.get('/' + resourceName + '-search');
     },
-    search(fields) {
+    /*
+    search(fields, pageSize) {
       let url = '/' + resourceName;
       let delimiter = '?';
+
+      if (pageSize) {
+        url += delimiter + 'size=' + pageSize;
+        delimiter = '&';
+      }
+
       fields.forEach((field, index) => {
         var value = field.value;
         if (value || value === 0 || value === false) {
@@ -78,9 +88,11 @@ myModule.factory('manageSvc', ['$http', $http => {
           delimiter = '&';
         }
       });
+
       //console.log('manage.js search: url =', url);
       return $http.get(url);
     },
+    */
     toString(id) {
       let config = {headers: {Accept: 'text/plain'}};
       return $http.get('/' + resourceName + '/' + id, config);
@@ -143,6 +155,11 @@ myModule.controller('ManageCtrl', [
 
   let filterModal;
 
+  function clearFilters() {
+    let filter = $scope.filter;
+    Object.keys(filter).forEach(prop => delete filter[prop]);
+  }
+
   function getAutoFilter() {
     let filter = {};
     if ($scope.af) {
@@ -176,18 +193,20 @@ myModule.controller('ManageCtrl', [
     dialogSvc.showError('Manage My * Error', err);
   }
 
+  function processResponse(res) {
+    $scope.objectCount = res.headers()['x-array-size'];
+    $scope.endIndex = Math.min(
+      $scope.startIndex + $scope.pageSize, $scope.objectCount);
+    $scope.objects = res.data;
+  }
+
   function setInputTypes(fields) {
     fields.forEach(field => field.inputType = getInputType(field));
   }
 
   function updateTable() {
     manageSvc.getObjects($scope).then(
-      res => {
-        $scope.objectCount = res.headers()['x-array-size'];
-        $scope.endIndex = Math.min(
-          $scope.startIndex + $scope.pageSize, $scope.objectCount);
-        $scope.objects = res.data;
-      },
+      res => processResponse(res),
       res => handleError(res.data));
   }
 
@@ -226,12 +245,8 @@ myModule.controller('ManageCtrl', [
   };
 
   $scope.applyFilter = () => {
-    /*
-    console.log('music.js applyFilter: $scope.filter.text =',
-      $scope.filter.text);
-    $scope.filter.text = '';
-    filterModal.close();
-    */
+    //$scope.filter.text = '';
+    //filterModal.close();
     updateTable();
   };
 
@@ -300,7 +315,7 @@ myModule.controller('ManageCtrl', [
 
   $scope.getLastPage = () => {
     var ps = $scope.pageSize;
-    $scope.startIndex = Math.floor($scope.objectCount / ps) * ps;
+    $scope.startIndex = Math.floor(($scope.objectCount - 1) / ps) * ps;
     updateTable();
   };
 
@@ -338,8 +353,24 @@ myModule.controller('ManageCtrl', [
   $scope.notImplemented = () => handleError('Not implemented yet');
 
   $scope.search = (fields) => {
-    manageSvc.search(fields).then(
-      res => $scope.objects = res.data,
+    // Copy search criteria into filters.
+    clearFilters();
+    let filter = $scope.filter;
+    fields.forEach(field => {
+      filter[field.property] = field.value;
+    });
+
+    // Copy relevant properties from scope, except autoFilter.
+    let config = {
+      sortField: $scope.sortField,
+      reverse: $scope.reverse,
+      filter: $scope.filter,
+      startIndex: $scope.startIndex,
+      pageSize: $scope.pageSize
+    };
+
+    manageSvc.getObjects(config).then(
+      res => processResponse(res),
       res => handleError(res.data));
   };
 
