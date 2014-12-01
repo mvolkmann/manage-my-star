@@ -130,7 +130,7 @@ myModule.controller('ManageCtrl', [
   '$modal', '$scope', 'dialogSvc', 'manageSvc',
   ($modal, $scope, dialogSvc, manageSvc) => {
 
-  let filterModal;
+  let dropdownMenu, dropdownTop, filterModal, initialScrollY;
 
   function clearFilters() {
     let filters = $scope.filters;
@@ -265,6 +265,7 @@ myModule.controller('ManageCtrl', [
   };
 
   $scope.filter = (event, field) => {
+    console.log('manage.js filter: entered');
     //TODO: Why does this get called initially with no event?
     if (!event) return;
 
@@ -369,17 +370,21 @@ myModule.controller('ManageCtrl', [
     }
 
     // Find the dropdown that is visible.
-    let dropdown = $('.dropdown-menu:visible');
-    let caret = dropdown.prev();
+    dropdownMenu = $('.dropdown-menu:visible');
+    let caret = dropdownMenu.prev();
+    let parent = dropdownMenu.parent();
 
     // Position the dropdown.
-    // Setting the CSS position property to "fixed"
-    // prevents it from being clipped by the bounds of the table header.
-    let offset = dropdown.offset();
-    let right = caret.offset().left + caret.width();
-    const bodyPadding = 20;
-    let left = right - dropdown.width() + bodyPadding;
-    dropdown.css({position: 'fixed', top: offset.top, left: left});
+    // Setting the CSS position property to "fixed" prevents it
+    // from being clipped by the bounds of the table header.
+    let caretOffset = caret.offset();
+    let caretWidth = parent.width();
+    let caretHeight = parent.height();
+    let right = caretOffset.left + caretWidth;
+    initialScrollY = window.pageYOffset;
+    dropdownTop = caretOffset.top + caretHeight - initialScrollY;
+    let left = right - dropdownMenu.width();
+    dropdownMenu.css({top: dropdownTop, left: left});
   };
 
   $scope.updateObject = () => {
@@ -391,6 +396,13 @@ myModule.controller('ManageCtrl', [
         updateTable(); // so new album is in sorted order
       },
       handleError);
+  };
+
+  window.onscroll = function (event) {
+    if (dropdownMenu) {
+      let top = dropdownTop + initialScrollY - window.pageYOffset;
+      dropdownMenu.css('top', top);
+    }
   };
 }]);
 
