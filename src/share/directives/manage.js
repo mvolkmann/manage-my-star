@@ -156,6 +156,14 @@ myModule.controller('ManageCtrl', [
     return filter;
   }
 
+  function getInputType(field) {
+    let type = field.type;
+    return type === 'boolean' ? 'checkbox' :
+      type === 'number' ? 'number' :
+      type === 'select' ? 'select' :
+      'text';
+  }
+
   function getObjectFromForm() {
     let obj = {};
     $scope.fields.forEach(field => {
@@ -166,6 +174,10 @@ myModule.controller('ManageCtrl', [
 
   function handleError(err) {
     dialogSvc.showError('Manage My * Error', err);
+  }
+
+  function setInputTypes(fields) {
+    fields.forEach(field => field.inputType = getInputType(field));
   }
 
   function updateTable() {
@@ -185,12 +197,16 @@ myModule.controller('ManageCtrl', [
   resourceName = $scope.resource;
   $scope.autoFilter = getAutoFilter();
 
-  manageSvc.getSearches().then(
-    res => $scope.searches = res.data);
+  manageSvc.getSearches().then(res => {
+    let searches = res.data;
+    searches.forEach(search => setInputTypes(search));
+    $scope.searches = searches;
+  });
 
   manageSvc.getFields().then(
     res => {
       $scope.fields = res.data;
+      setInputTypes($scope.fields);
       $scope.sortField = $scope.fields.find(
         field => field.property === $scope.sortProperty);
       updateTable();
@@ -275,13 +291,6 @@ myModule.controller('ManageCtrl', [
     let right = offset.left + caret.width();
     let left = right - dialog.width();
     dialog.css({position: 'fixed', top: top, left: left});
-  };
-
-  $scope.getInputType = field => {
-    let type = field.type;
-    return type === 'boolean' ? 'checkbox' :
-      type === 'number' ? 'number' :
-      'text';
   };
 
   $scope.getFirstPage = () => {

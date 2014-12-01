@@ -3,9 +3,15 @@
   <div ng-repeat="fields in searches" class="form-group row">
     <span ng-repeat="field in fields">
       <label>{{field.label}}</label>
-      <input ng-class="field.type === 'boolean' ? '' : 'form-control'"
-        type="{{getInputType(field)}}"
+      <input ng-if="field.inputType !== 'select'"
+        ng-class="field.type === 'boolean' ? '' : 'form-control'"
+        type="{{field.inputType}}"
         ng-model="field.value">
+      <select ng-if="field.inputType === 'select'" class="form-control">
+        <option ng-repeat="option in field.options">
+          {{option}}
+        </option>
+      </select>
     </span>
     <span class="glyphicon glyphicon-search" ng-click="search(fields)"></span>
   </div>
@@ -17,30 +23,19 @@
 <div ng-if="fields">
   <form ng-if="showForm" name="myForm">
     <div class="row" ng-repeat="field in fields">
-      <!--div ng-if="getInputType(field) === 'checkbox'" class="checkbox">
-        <label></label>
-        <label>
-          <input type="checkbox"
-            ng-model="field.value"
-            ng-readonly="isReadOnly(field, editObj)"
-            required>
-          {{field.label}}
-        </label>
-      </div>
-      <div ng-if="getInputType(field) !== 'checkbox'" class="form-group">
-        <label>{{field.label}}</label>
-        <input class="form-control" type="{{getInputType(field)}}"
-          ng-model="field.value"
-          ng-readonly="isReadOnly(field, editObj)"
-          required>
-      </div-->
       <div class="form-group">
         <label>{{field.label}}</label>
-        <input ng-class="field.type === 'boolean' ? '' : 'form-control'"
-          type="{{getInputType(field)}}"
+        <input ng-if="field.inputType !== 'select'"
+          ng-class="field.type === 'boolean' ? '' : 'form-control'"
+          type="{{field.inputType}}"
           ng-model="field.value"
           ng-readonly="isReadOnly(field, editObj)"
           required>
+        <select ng-if="field.inputType === 'select'" class="form-control">
+          <option ng-repeat="option in field.options">
+            {{option}}
+          </option>
+        </select>
       </div>
     </div>
   </form>
@@ -118,7 +113,7 @@
           </div>
           <input ng-if="canFilter"
             class="filter form-control"
-            type="{{getInputType(field)}}"
+            type="{{field.inputType}}"
             ng-model="filter[field.property]"
             ng-change="applyFilter()">
         </th>

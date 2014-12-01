@@ -79,16 +79,43 @@ function getMusic(cb) {
 function getFieldMap() {
   var map = {};
 
-  function addField(property, type, label, readOnly = false) {
+  function addField({property, type, label, readOnly, options}) {
     if (!label) label = propertyToLabel(property);
-    map[property] = {property, type, label, readOnly};
+    if (!readOnly) readOnly = false;
+
+    map[property] = {property, type, label, readOnly, options};
+
     if (type === 'boolean') map[property].value = false;
   }
 
-  addField('artist', 'string', 'Artist', true);
-  addField('title', 'string');
-  addField('rating', 'number');
-  addField('own', 'boolean', 'Own?');
+  addField({
+    property: 'artist',
+    type: 'string',
+    label: 'Artist',
+    readOnly: true
+  });
+
+  addField({
+    property: 'title',
+    type: 'string'
+  });
+
+  addField({
+    property: 'genre',
+    type: 'select',
+    options: ['Alternative', 'Classical', 'Folk', 'Rock', 'Other']
+  });
+
+  addField({
+    property: 'rating',
+    type: 'number'
+  });
+
+  addField({
+    property: 'own',
+    type: 'boolean',
+    label: 'Own?'
+  });
 
   return map;
 }
@@ -264,7 +291,8 @@ app.put('/album/:id', (req, res) => {
  */
 app.get('/album-field', (req, res) => {
   const fields = [
-    fieldMap.artist, fieldMap.title, fieldMap.rating, fieldMap.own
+    fieldMap.artist, fieldMap.title, fieldMap.genre,
+    fieldMap.rating, fieldMap.own
   ];
 
   res.set('Content-Type', 'application/json');
@@ -278,6 +306,7 @@ app.get('/album-field', (req, res) => {
 app.get('/album-search', (req, res) => {
   const searches = [
     [fieldMap.artist, fieldMap.title],
+    [fieldMap.genre],
     [fieldMap.rating],
     [fieldMap.own]
   ];
