@@ -431,6 +431,7 @@ myModule.directive('manageMyStar', () => {
       canDelete: '=',
       canFilter: '=',
       canUpdate: '=',
+      header: '@',
       hideProps: '@', // comma-separated list of property names
       resource: '@',
       sortProperty: '@',
