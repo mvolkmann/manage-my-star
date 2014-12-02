@@ -314,9 +314,7 @@ app.get('/album-field', (req, res) => {
 app.get('/album-search', (req, res) => {
   const searches = [
     [fieldMap.artist, fieldMap.title],
-    [fieldMap.genre],
-    [fieldMap.rating],
-    [fieldMap.own]
+    [fieldMap.genre, fieldMap.rating, fieldMap.own]
   ];
 
   res.set('Content-Type', 'application/json');

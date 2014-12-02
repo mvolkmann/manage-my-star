@@ -1,163 +1,177 @@
-<h3 class="mms-header">{{header}}</h3>
+<div class="manage-my-star">
+  <h3 class="heading">{{header}}</h3>
 
-<accordion id="manage-my-star-accordion" close-others="true">
+  <tabset>
+    <tab heading="{{manageHeading}}">
+      <form ng-if="showForm" name="myForm">
+        <div class="row" ng-repeat="field in fields">
+          <div class="form-group">
+            <label>{{field.label}}</label>
+            <input ng-if="field.inputType !== 'select'"
+              ng-class="field.type === 'boolean' ? '' : 'form-control'"
+              type="{{field.inputType}}"
+              ng-model="field.value"
+              ng-disabled="isReadOnly(field, editObj)"
+              required>
+            <select ng-if="field.inputType === 'select'" class="form-control"
+              ng-model="field.value"
+              ng-disabled="isReadOnly(field, editObj)">
+              <option ng-repeat="option in field.options">{{option}}</option>
+            </select>
+          </div>
+        </div>
+      </form>
 
-  <accordion-group id="search-accordion" heading="Search" is-open="accordionStates.searching">
-    <div class="searches">
-      <div ng-repeat="fields in searches" class="form-group row">
-        <span ng-repeat="field in fields">
-          <label>{{field.label}}</label>
-          <input ng-if="field.inputType !== 'select'"
-            ng-class="field.type === 'boolean' ? '' : 'form-control'"
-            type="{{field.inputType}}"
-            ng-model="field.value">
-          <select ng-if="field.inputType === 'select'" class="form-control"
-            ng-model="field.value">
-            <option ng-repeat="option in field.options">{{option}}</option>
-          </select>
-        </span>
-        <span class="glyphicon glyphicon-search" ng-click="search(fields)"></span>
+      <div ng-if="showForm" class="row">
+        <label></label>
+        <button class="btn btn-default" ng-click="clearForm()">
+          Clear
+        </button>
+        <button ng-if="canAdd" class="btn btn-default" title="Add"
+          ng-click="addObject()"
+          ng-disabled="myForm.$invalid">
+          Add
+          <!--span class="glyphicon glyphicon-plus"></span-->
+        </button>
+        <button ng-if="canUpdate" class="btn btn-default"
+          ng-click="updateObject()"
+          ng-disabled="!editObj || myForm.$invalid">
+          Update
+        </button>
+        <span>Click in a table row to edit it using the fields above.</span>
       </div>
-    </div>
-  </accordion-group>
-
-  <accordion-group id="manage-accordion" heading="Manage" is-open="accordionStates.managing">
-    <form ng-if="showForm" name="myForm">
-      <div class="row" ng-repeat="field in fields">
-        <div class="form-group">
-          <label>{{field.label}}</label>
-          <input ng-if="field.inputType !== 'select'"
-            ng-class="field.type === 'boolean' ? '' : 'form-control'"
-            type="{{field.inputType}}"
-            ng-model="field.value"
-            ng-disabled="isReadOnly(field, editObj)"
-            required>
-          <select ng-if="field.inputType === 'select'" class="form-control"
-            ng-model="field.value"
-            ng-disabled="isReadOnly(field, editObj)">
-            <option ng-repeat="option in field.options">{{option}}</option>
-          </select>
+    </tab>
+    <tab heading="{{searchHeading}}">
+      <!--<button id="show-more-btn" class="btn btn-default"-->
+        <!--ng-click="toggleSearches()">-->
+        <!--Show {{searchAmount}}-->
+      <!--</button>-->
+      <div class="searches">
+        <div ng-repeat="fields in searches" class="form-group"
+          ng-show="showSearch($index)">
+          <div class="search-field" ng-repeat="field in fields">
+            <label>{{field.label}}</label><br>
+            <input ng-if="field.inputType !== 'select'"
+              ng-class="field.type === 'boolean' ? '' : 'form-control'"
+              type="{{field.inputType}}"
+              ng-model="field.value">
+            <select ng-if="field.inputType === 'select'" class="form-control"
+              ng-model="field.value">
+              <option ng-repeat="option in field.options">{{option}}</option>
+            </select>
+          </div>
+          <span class="glyphicon glyphicon-search" ng-click="search(fields)"></span>
+          <span id="search-filter-toggle" ng-if="$index === 0">
+            {{searchAmount}} filters
+            <span id="show-more-btn" class="glyphicon"
+              ng-class="searchAmount === 'more' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up'"
+              ng-click="toggleSearches()">
+            </button>
+          </span>
         </div>
       </div>
-    </form>
+    </tab>
+  </tabset>
 
-    <div ng-if="showForm" class="row">
-      <label></label>
-      <button class="btn btn-default" ng-click="clearForm()">
-        Clear
+  <hr>
+
+  <!-- Don't display anything until the fields
+      have been retrieved from the server. -->
+  <div ng-if="fields">
+    <div class="pagination" ng-hide="objectCount <= pageSize">
+      Showing {{startIndex + 1}} to {{endIndex}} of {{objectCount}}
+      <button class="btn btn-default"
+        ng-disabled="!hasPreviousPage()"
+        ng-click="getFirstPage()">
+        <span class="glyphicon glyphicon-fast-backward"></span>
       </button>
-      <button ng-if="canAdd" class="btn btn-default"
-        ng-click="addObject()"
-        ng-disabled="myForm.$invalid">
-        Add
+      <button class="btn btn-default"
+        ng-disabled="!hasPreviousPage()"
+        ng-click="getPreviousPage()">
+        <span class="glyphicon glyphicon-backward"></span>
+        Previous
       </button>
-      <button ng-if="canUpdate" class="btn btn-default"
-        ng-click="updateObject()"
-        ng-disabled="!editObj || myForm.$invalid">
-        Update
+      <button class="btn btn-default"
+        ng-disabled="!hasNextPage()"
+        ng-click="getNextPage()">
+        Next
+        <span class="glyphicon glyphicon-forward"></span>
       </button>
-      <span>Click in a table row to edit it using the fields above.</span>
+      <button class="btn btn-default"
+        ng-disabled="!hasNextPage()"
+        ng-click="getLastPage()">
+        <span class="glyphicon glyphicon-fast-forward"></span>
+      </button>
     </div>
-  </accordion-group>
 
-</accordion>
-
-<!-- Don't display anything until the fields
-     have been retrieved from the server. -->
-<div ng-if="fields">
-  <div class="pagination" ng-hide="objectCount <= pageSize">
-    Showing {{startIndex + 1}} to {{endIndex}} of {{objectCount}}
-    <button class="btn btn-default"
-      ng-disabled="!hasPreviousPage()"
-      ng-click="getFirstPage()">
-      <span class="glyphicon glyphicon-fast-backward"></span>
-    </button>
-    <button class="btn btn-default"
-      ng-disabled="!hasPreviousPage()"
-      ng-click="getPreviousPage()">
-      <span class="glyphicon glyphicon-backward"></span>
-      Previous
-    </button>
-    <button class="btn btn-default"
-      ng-disabled="!hasNextPage()"
-      ng-click="getNextPage()">
-      Next
-      <span class="glyphicon glyphicon-forward"></span>
-    </button>
-    <button class="btn btn-default"
-      ng-disabled="!hasNextPage()"
-      ng-click="getLastPage()">
-      <span class="glyphicon glyphicon-fast-forward"></span>
-    </button>
-  </div>
-
-  <table class="manage-table-head">
-    <thead>
-      <tr ng-class="accordionStates.managing ? 'managing' : 'searching'">
-        <th ng-repeat="field in fields" ng-if="!isHidden(field)">
-          <div>
-            <a ng-click="sortOn(field)">
-              {{field.label}}
-            </a>
-            <span ng-show="sortField === field && !reverse"
-              ng-click="sortOn(field)">
-              &#x25b2;
-            </span>
-            <span ng-show="sortField === field && reverse"
-              ng-click="sortOn(field)">
-              &#x25bc;
-            </span>
-            <span class="dropdown" dropdown on-toggle="tableHeadToggle(open)">
-              <a href class="dropdown-toggle" dropdown-toggle>
-                <span class="caret"></span>
+    <table class="manage-table-head">
+      <thead>
+        <tr ng-class="accordionStates.managing ? 'managing' : 'searching'">
+          <th ng-repeat="field in fields" ng-if="!isHidden(field)">
+            <div>
+              <a ng-click="sortOn(field)">
+                {{field.label}}
               </a>
-              <ul class="dropdown-menu">
-                <li><a href>foo</a></li>
-                <li><a href>bar</a></li>
-                <li><a href>baz</a></li>
-              </ul>
-            </span>
-          </div>
-          <input ng-if="canFilter && field.inputType !== 'select'"
-            class="filter form-control"
-            type="{{field.inputType}}"
-            ng-model="filters[field.property]"
-            ng-change="applyFilter()">
-          <select ng-if="canFilter && field.inputType === 'select'"
-            class="filter form-control"
-            ng-model="filters[field.property]"
-            ng-change="applyFilter()">
-            <option ng-repeat="option in field.options">{{option}}</option>
-          </select>
-        </th>
-        <th><div>Actions</div></th>
-      </tr>
-    </thead>
-  </table>
-  <table class="manage-table-body">
-    <tbody>
-      <tr ng-repeat="obj in objects" ng-click="editObject($index, obj)">
-        <td class="manage-type-{{field.type}}"
-          ng-repeat="field in fields"
-          ng-if="!isHidden(field)">
-          {{getPropValue(obj, field)}}
-        </td>
-        <td ng-if="actionCount > 0">
-          <button ng-if="canAdd && accordionStates.searching"
-            class="btn btn-default"
-            ng-click="addObject($event, $index)">
-            Add
-          </button>
-          <button ng-if="canDelete && accordionStates.managing"
-            class="btn btn-default"
-            ng-click="deleteObject($event, $index)">
-            Delete
-          </button>
-          <!--button class="btn btn-default" ng-click="notImplemented()">
-            Foo
-          </button-->
-        </td>
-      </tr>
-    </tbody>
-  </table>
+              <span ng-show="sortField === field && !reverse"
+                ng-click="sortOn(field)">
+                &#x25b2;
+              </span>
+              <span ng-show="sortField === field && reverse"
+                ng-click="sortOn(field)">
+                &#x25bc;
+              </span>
+              <span class="dropdown" dropdown on-toggle="tableHeadToggle(open)">
+                <a href class="dropdown-toggle" dropdown-toggle>
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href>foo</a></li>
+                  <li><a href>bar</a></li>
+                  <li><a href>baz</a></li>
+                </ul>
+              </span>
+            </div>
+            <input ng-if="canFilter && field.inputType !== 'select'"
+              class="filter form-control"
+              type="{{field.inputType}}"
+              ng-model="filters[field.property]"
+              ng-change="applyFilter()">
+            <select ng-if="canFilter && field.inputType === 'select'"
+              class="filter form-control"
+              ng-model="filters[field.property]"
+              ng-change="applyFilter()">
+              <option ng-repeat="option in field.options">{{option}}</option>
+            </select>
+          </th>
+          <th class="actions"><div>Actions</div></th>
+        </tr>
+      </thead>
+    </table>
+    <table class="manage-table-body">
+      <tbody>
+        <tr ng-repeat="obj in objects" ng-click="editObject($index, obj)">
+          <td class="manage-type-{{field.type}}"
+            ng-repeat="field in fields"
+            ng-if="!isHidden(field)">
+            {{getPropValue(obj, field)}}
+          </td>
+          <td ng-if="actionCount > 0" class="actions">
+            <button ng-if="canAdd && accordionStates.searching"
+              class="btn btn-default" title="Add"
+              ng-click="addObject($event, $index)">
+              <span class="glyphicon glyphicon-plus"></span>
+            </button>
+            <button ng-if="canDelete && accordionStates.managing"
+              class="btn btn-default" title="Delete"
+              ng-click="deleteObject($event, $index)">
+              <span class="glyphicon glyphicon-trash"></span>
+            </button>
+            <!--button class="btn btn-default" ng-click="notImplemented()">
+              Foo
+            </button-->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -195,6 +195,7 @@ myModule.controller('ManageCtrl', [
   resourceName = $scope.resource;
   $scope.autoFilters = getAutoFilters();
   $scope.filters = {};
+  $scope.searchAmount = 'more';
 
   // Manage accordions.
   $scope.accordionStates = {managing: true, searching: false};
@@ -370,6 +371,9 @@ myModule.controller('ManageCtrl', [
       res => handleError(res.data));
   };
 
+  $scope.showSearch = index =>
+    $scope.searchAmount === 'more' ? index === 0 : true;
+
   $scope.sortOn = field => {
     $scope.reverse = field === $scope.sortField && !$scope.reverse;
     $scope.sortField = field;
@@ -381,7 +385,6 @@ myModule.controller('ManageCtrl', [
     if (!open) {
       // Resume scroll table body.
       tableBody.css('overflow', 'scroll');
-
       return;
     }
 
@@ -401,6 +404,10 @@ myModule.controller('ManageCtrl', [
     dropdownTop = caretOffset.top + caretHeight - initialScrollY;
     let left = right - dropdownMenu.width();
     dropdownMenu.css({top: dropdownTop, left: left});
+  };
+
+  $scope.toggleSearches = () => {
+    $scope.searchAmount = $scope.searchAmount === 'more' ? 'less' : 'more';
   };
 
   $scope.updateObject = () => {
@@ -433,7 +440,9 @@ myModule.directive('manageMyStar', () => {
       canUpdate: '=',
       header: '@',
       hideProps: '@', // comma-separated list of property names
+      manageHeading: '@',
       resource: '@',
+      searchHeading: '@',
       sortProperty: '@',
       pageSize: '=', // must use = instead of @ for numbers
       objToStr: '='

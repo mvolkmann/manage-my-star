@@ -1,148 +1,195 @@
+@border-color: white;
+@border-width: 3px;
 @cell-width: 200px;
 @label-width: 70px;
-@manage-color: Snow; //LightGray; //#666;
-@search-color: LightBlue; //#ff6833;
+@manage-color: PeachPuff;
+@search-color: LightBlue;
 @table-width: 600px; // 100%;
 @scrollbar-width: 0; // in Windows this should be 16px
 
-body {
-  font-family: sans-serif;
-  padding: 20px;
-}
+.manage-my-star {
+  font-family: Arial, sans-serif;
 
-.mms-header {
-  background-color: LightGray;
-  margin: 1px;
-  padding: 10px;
-}
-
-table {
-  border-left: solid gray 1px;
-  border-top: solid gray 1px;
-  border-collapse: collapse;
-}
-
-td, th {
-  border-bottom: solid gray 1px;
-  border-right: solid gray 1px;
-  padding: 10px;
-  min-width: @cell-width;
-}
-
-th {
-  div {
-    font-size: 14pt;
-    font-weight: bold;
+  hr {
+    margin: 10px 0 0 0;
   }
-  input {
-    width: 50px;
+
+  table {
+    border-left: solid @border-color @border-width;
+    border-top: solid @border-color @border-width;
+    border-collapse: collapse;
   }
-}
 
-#manage-accordion .panel-heading {
-  background-color: @manage-color;
-}
+  tbody {
+    tr:nth-child(even) {
+      background-color: #f7f6f6;
+    }
 
-#search-accordion .panel-heading {
-  background-color: @search-color;
-}
+    tr:nth-child(odd) {
+      background-color: #e9e7e7;
+    }
+  }
 
-/* Overriding the Bootstrap caret class to make it bigger. */
-.caret {
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid #000000;
-  float: right;
-}
+  th {
+    div {
+      font-size: 14pt;
+      font-weight: bold;
+    }
+    input {
+      //width: 100px;
+    }
+  }
+  td, th {
+    border-right: solid @border-color @border-width;
+    border-bottom: solid @border-color @border-width;
+    padding: 5px 10px;
+    min-width: @cell-width;
+  }
 
-.dropdown {
-  float: right;
-}
+  #manage-accordion .panel-heading {
+    background-color: @manage-color;
+  }
 
-.dropdown-menu {
-  position: fixed;
-}
+  #search-accordion .panel-heading {
+    background-color: @search-color;
+  }
 
-.dropdown-toggle .caret {
-  font-size: 24pt;
-}
+  #search-filter-toggle {
+    //float: right;
+    margin-left: 10px;
+  }
 
-.filter {
-  width: @cell-width - 21;
-}
+  .actions {
+    min-width: 95px;
+    text-align: center;
+  }
 
-.manage-table-head {
-  display: block;
-  margin-top: 10px;
-  overflow-x: hidden;
-  width: @table-width;
-}
+  /* Overriding the Bootstrap caret class to make it bigger. */
+  .caret {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #000000;
+    float: right;
+  }
 
-.manage-table-body {
-  display: block;
-  overflow: scroll;
-  position: relative;
-  width: @table-width + @scrollbar-width; // Theron modified
-  height: 200px;
-}
+  .dropdown {
+    float: right;
+  }
 
-.manage-type-number {
-  text-align: right;
-}
+  .dropdown-menu {
+    position: fixed;
+  }
 
-.manage-type-string {
-}
+  .dropdown-toggle .caret {
+    font-size: 24pt;
+  }
 
-.managing {
-  background-color: @manage-color;
-}
+  .filter {
+    width: @cell-width - 23;
+  }
 
-.pagination {
-  margin: 10px 0 0 0;
-}
+  .heading {
+    background-color: LightGray;
+    margin: 0 0 10px 0;
+    padding: 10px;
+  }
 
-.row {
-  label {
+  .manage-table-head {
+    display: block;
+    margin-top: 10px;
+    overflow-x: hidden;
+    width: @table-width;
+
+    a {
+      font-size: 10pt;
+      text-transform: uppercase;
+    }
+  }
+
+  .manage-table-body {
+    border-top: none;
+    display: block;
+    overflow: scroll;
+    position: relative;
+    width: @table-width + @scrollbar-width; // Theron modified
+    height: 200px;
+  }
+
+  .manage-type-number {
     text-align: right;
-    width: @label-width;
   }
 
-  input {
+  .manage-type-string {
+  }
+
+  .managing {
+    background-color: @manage-color;
+  }
+
+  .pagination {
+    margin: 10px 0 0 0;
+  }
+
+  .row {
+    label {
+      text-align: right;
+      width: @label-width;
+    }
+
+    input {
+      display: inline-block;
+      margin-left: 5px;
+      text-align: left;
+    }
+
+    input[type='number'] {
+      width: 100px;
+    }
+
+    input[type='text'] {
+      width: 300px;
+    }
+
+    select {
+      display: inline-block;
+      margin-left: 5px;
+      width: auto;
+    }
+
+    .form-group {
+      margin-bottom: 5px;
+    }
+  }
+
+  .searches {
+    input, select {
+      display: inline-block;
+      width: auto;
+    }
+
+    .form-group {
+      margin-bottom: 5px;
+    }
+  }
+
+  .search-field {
     display: inline-block;
-    margin-left: 5px;
-    text-align: left;
+    margin-right: 5px;
+
+    label {
+      margin-bottom: 0
+    }
   }
 
-  input[type='number'] {
-    width: 100px;
+  .searching {
+    background-color: @search-color
   }
 
-  input[type='text'] {
-    width: 300px;
-  }
-
-  select {
-    display: inline-block;
-    margin-left: 5px;
-    width: auto;
-  }
-
-  .form-group {
-    margin-bottom: 10px;
+  .tab-pane {
+    padding-top: 5px;
   }
 }
 
-.searches {
-  input, select {
-    display: inline-block;
-    width: auto;
-  }
-
-  .glyphicon {
-    margin-left: 15px;
-  }
-}
-
-.searching {
-  background-color: @search-color
+.manage-my-star > div {
+  margin-left: 10px;
 }
