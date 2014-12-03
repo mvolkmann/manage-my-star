@@ -1,9 +1,9 @@
+@active-color: #cfaa51;
 @border-color: white;
-@border-width: 3px;
+@border-width: 2px;
 @cell-width: 200px;
+@inactive-color: #868281;
 @label-width: 70px;
-@manage-color: PeachPuff;
-@search-color: LightBlue;
 @table-width: 600px; // 100%;
 @scrollbar-width: 0; // in Windows this should be 16px
 
@@ -46,14 +46,6 @@
     min-width: @cell-width;
   }
 
-  #manage-accordion .panel-heading {
-    background-color: @manage-color;
-  }
-
-  #search-accordion .panel-heading {
-    background-color: @search-color;
-  }
-
   #search-filter-toggle {
     //float: right;
     margin-left: 10px;
@@ -89,7 +81,7 @@
   }
 
   .heading {
-    background-color: LightGray;
+    background-color: #dedede;
     margin: 0 0 10px 0;
     padding: 10px;
   }
@@ -103,7 +95,7 @@
     a {
       color: white;
       font-size: 10pt;
-      text-decoration: none !important;
+      text-decoration: none;
       text-transform: uppercase;
     }
 
@@ -130,8 +122,15 @@
   .manage-type-string {
   }
 
-  .managing {
-    background-color: @manage-color;
+  .nav-tabs {
+    li > a {
+      background-color: @inactive-color;
+      color: black;
+    }
+    .active > a {
+      background-color: @active-color;
+      color: white;
+    }
   }
 
   .pagination {
@@ -189,8 +188,8 @@
     }
   }
 
-  .searching {
-    background-color: @search-color
+  .sort-indicator {
+    font-size: 14px;
   }
 
   .tab-pane {

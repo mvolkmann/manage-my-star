@@ -2,7 +2,7 @@
   <h3 class="heading">{{header}}</h3>
 
   <tabset>
-    <tab heading="{{manageHeading}}">
+    <tab heading="{{manageHeading}}" select="switchToManage()">
       <form ng-if="showForm" name="myForm">
         <div class="row" ng-repeat="field in fields">
           <div class="form-group">
@@ -41,7 +41,7 @@
         <span>Click in a table row to edit it using the fields above.</span>
       </div>
     </tab>
-    <tab heading="{{searchHeading}}">
+    <tab heading="{{searchHeading}}" select="switchToSearch()">
       <!--<button id="show-more-btn" class="btn btn-default"-->
         <!--ng-click="toggleSearches()">-->
         <!--Show {{searchAmount}}-->
@@ -112,11 +112,13 @@
               <a ng-click="sortOn(field)">
                 {{field.label}}
               </a>
-              <span ng-show="sortField === field && !reverse"
+              <span class="sort-indicator"
+                ng-show="sortField === field && !reverse"
                 ng-click="sortOn(field)">
                 &#x25b2;
               </span>
-              <span ng-show="sortField === field && reverse"
+              <span class="sort-indicator"
+                ng-show="sortField === field && reverse"
                 ng-click="sortOn(field)">
                 &#x25bc;
               </span>
@@ -156,12 +158,12 @@
             {{getPropValue(obj, field)}}
           </td>
           <td ng-if="actionCount > 0" class="actions">
-            <button ng-if="canAdd && accordionStates.searching"
+            <button ng-if="canAdd && activeTab === 'search'"
               class="btn btn-default" title="Add"
               ng-click="addObject($event, $index)">
               <span class="glyphicon glyphicon-plus"></span>
             </button>
-            <button ng-if="canDelete && accordionStates.managing"
+            <button ng-if="canDelete && activeTab === 'manage'"
               class="btn btn-default" title="Delete"
               ng-click="deleteObject($event, $index)">
               <span class="glyphicon glyphicon-trash"></span>
