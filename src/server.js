@@ -28,7 +28,8 @@ function applyFilter(arr, filter) {
       if (propValue === undefined && type === 'boolean') propValue = false;
 
       let keep =
-        type === 'string' ? propValue.includes(filterValue) :
+        type === 'string' ?
+          propValue.toLowerCase().includes(filterValue.toLowerCase()) :
         type === 'number' ? propValue >= filterValue :
         type === 'boolean' ? propValue === filterValue :
         true; //TODO: don't know how to handle other types yet
