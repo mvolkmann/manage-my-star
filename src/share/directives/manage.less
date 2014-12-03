@@ -5,7 +5,11 @@
 @inactive-color: #868281;
 @label-width: 70px;
 @table-width: 600px; // 100%;
-@scrollbar-width: 0; // in Windows this should be 16px
+@scrollbar-width: 16px; // on Mac this should be zero
+
+.on-mac .manage-table-body {
+  width: @table-width !important; // not adding @scrollbar-width
+}
 
 .manage-my-star {
   font-family: Arial, sans-serif;
@@ -111,7 +115,7 @@
     display: block;
     overflow: scroll;
     position: relative;
-    width: @table-width + @scrollbar-width; // Theron modified
+    width: @table-width + @scrollbar-width;
     height: 200px;
   }
 

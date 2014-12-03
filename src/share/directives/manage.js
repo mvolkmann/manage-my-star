@@ -134,6 +134,9 @@ myModule.controller('ManageCtrl', [
 
   let dropdownMenu, dropdownTop, filterModal, initialScrollY;
 
+  let onMac = /Mac/.test(navigator.platform);
+  if (onMac) $('body').addClass('on-mac');
+
   function clearFilters() {
     let filters = $scope.filters;
     Object.keys(filters).forEach(prop => delete filters[prop]);
