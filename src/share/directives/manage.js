@@ -176,7 +176,10 @@ myModule.controller('ManageCtrl', [
   }
 
   function processResponse(res) {
+    // This is the total number of matching objects,
+    // not the number of objects that were returned from the server!
     $scope.objectCount = res.headers()['x-array-size'];
+
     $scope.endIndex = Math.min(
       $scope.startIndex + $scope.pageSize, $scope.objectCount);
     $scope.objects = res.data;
