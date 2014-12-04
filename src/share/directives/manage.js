@@ -123,7 +123,10 @@ function setupTable() {
       }
 
       head0.scrollTop = body0.scrollTop - headBottomY;
-      head0.scrollLeft = body0.scrollLeft;
+
+      // Not sure why this delta is needed.
+      let delta = body0.scrollLeft === 0 ? 0 : 1;
+      head0.scrollLeft = body0.scrollLeft + delta;
     });
   });
 }
@@ -450,8 +453,10 @@ myModule.directive('manageMyStar', () => {
       canUpdate: '=',
       header: '@',
       hideProps: '@', // comma-separated list of property names
+      manageActions: '=',
       manageHeading: '@',
       resource: '@',
+      searchActions: '=',
       searchHeading: '@',
       sortProperty: '@',
       pageSize: '=', // must use = instead of @ for numbers
@@ -465,6 +470,7 @@ myModule.directive('manageMyStar', () => {
         [];
       scope.showForm = scope.canAdd || scope.canUpdate;
       scope.actionCount = scope.canDelete ? 1 : 0;
+      console.log('manage.js link: scope.manageActions =', scope.manageActions);
     }
   };
 });

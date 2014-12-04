@@ -157,20 +157,40 @@
             ng-if="!isHidden(field)">
             {{getPropValue(obj, field)}}
           </td>
+
           <td ng-if="actionCount > 0" class="actions">
             <button ng-if="canAdd && activeTab === 'search'"
               class="btn btn-default" title="Add"
               ng-click="addObject($event, $index)">
               <span class="glyphicon glyphicon-plus"></span>
             </button>
-            <button ng-if="canDelete && activeTab === 'manage'"
-              class="btn btn-default" title="Delete"
+
+            <button class="btn btn-default"
+              ng-if="canDelete && activeTab === 'manage'"
+              title="Delete"
               ng-click="deleteObject($event, $index)">
               <span class="glyphicon glyphicon-trash"></span>
             </button>
-            <!--button class="btn btn-default" ng-click="notImplemented()">
-              Foo
-            </button-->
+
+            <button class="btn btn-default"
+              ng-if="activeTab === 'manage'"
+              ng-repeat="obj in manageActions"
+              title="{{obj.title}}"
+              ng-click="obj.action()">
+              <span ng-if="obj.glyph"
+                class="glyphicon glyphicon-{{obj.glyph}}"></span>
+              <span ng-if="obj.name">{{obj.name}}</span>
+            </button>
+
+            <button class="btn btn-default"
+              ng-if="activeTab === 'search'"
+              ng-repeat="obj in searchActions"
+              title="{{obj.title}}"
+              ng-click="obj.action()">
+              <span ng-if="obj.glyph"
+                class="glyphicon glyphicon-{{obj.glyph}}"></span>
+              <span ng-if="obj.name">{{obj.name}}</span>
+            </button>
           </td>
         </tr>
       </tbody>

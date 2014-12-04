@@ -23,7 +23,7 @@
     <script src="build/share/directives/manage.js"></script>
     <script src="build/music/main.js"></script>
   </head>
-  <body>
+  <body ng-controller="MusicCtrl">
     <div manage-my-star
       resource="album"
       header="My Music Collection"
@@ -33,7 +33,9 @@
       can-filter="true"
       can-update="true"
       hide-props="own"
+      manage-actions="manageActions"
       manage-heading="Manage My Albums"
+      search-actions="searchActions"
       search-heading="Search My Albums"
       page-size=5
       auto-filters="own=true">
