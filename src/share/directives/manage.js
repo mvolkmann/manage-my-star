@@ -56,15 +56,17 @@ myModule.factory('manageSvc', ['$http', $http => {
     getFields() {
       return $http.get('/' + resourceName + '-field');
     },
-    getObjects({sortField, reverse, // using destructuring
+    getObjects({mode, sortField, reverse, // using destructuring
       autoFilters, filters,
       startIndex, pageSize
     }) {
+      if (!sortField) return; // premature call
+
       let url = '/' + resourceName + '?sort=' + sortField.property;
       if (reverse) url += '&reverse=' + reverse;
       if (startIndex !== undefined) url += '&start=' + startIndex;
       if (pageSize) url += '&size=' + pageSize;
-      url += getFilterQueryParams(autoFilters, 'af');
+      if (mode !== 'search') url += getFilterQueryParams(autoFilters, 'af');
       url += getFilterQueryParams(filters, 'filter');
       //console.log('manage.js getObjects: url =', url);
       return $http.get(url);
@@ -145,6 +147,11 @@ myModule.controller('ManageCtrl', [
     Object.keys(filters).forEach(prop => delete filters[prop]);
   }
 
+  function clearSearches() {
+    $scope.searches.forEach(fields =>
+      fields.forEach(field => field.value = null));
+  }
+
   function getAutoFilters() {
     let filters = {};
     if ($scope.af) {
@@ -178,14 +185,26 @@ myModule.controller('ManageCtrl', [
     dialogSvc.showError('Manage My * Error', err);
   }
 
+  function moveFocusToFirstVisibleInput() {
+    setTimeout(() =>
+      $('input:visible,select:visible').first().focus(), 100);
+  }
+
   function processResponse(res) {
     // This is the total number of matching objects,
     // not the number of objects that were returned from the server!
-    $scope.objectCount = res.headers()['x-array-size'];
+    $scope.objectCount = Number(res.headers()['x-array-size']);
 
     $scope.endIndex = Math.min(
       $scope.startIndex + $scope.pageSize, $scope.objectCount);
     $scope.objects = res.data;
+
+    if ($scope.canAdd &&
+      $scope.mode === 'search' &&
+      $scope.objectCount === 0) {
+      let msg = 'No matches were found.  Would you like to create one?';
+      dialogSvc.confirm(msg).then($scope.switchToCreate);
+    }
   }
 
   function setInputTypes(fields) {
@@ -193,7 +212,8 @@ myModule.controller('ManageCtrl', [
   }
 
   function updateTable() {
-    manageSvc.getObjects($scope).then(
+    let promise = manageSvc.getObjects($scope);
+    if (promise) promise.then(
       res => processResponse(res),
       res => handleError(res.data));
   }
@@ -207,22 +227,21 @@ myModule.controller('ManageCtrl', [
   $scope.searchAmount = 'more';
 
   // Manage tabs.
-  let savedObjects;
-  $scope.switchToManage = (arg) => {
-    $scope.activeTab = 'manage';
-    if (savedObjects) {
-      $scope.objectCount = savedObjects.length;
-      $scope.objects = savedObjects;
-    }
+
+  $scope.switchToManage = () => {
+    $scope.clearForm();
+    $scope.filters = {}; // clears them
+    $scope.mode = 'manage';
+    moveFocusToFirstVisibleInput();
+    updateTable();
   };
-  $scope.switchToSearch = (arg) => {
-    $scope.activeTab = 'search';
-    let objects = $scope.objects;
-    if (objects && objects.length) {
-      savedObjects = objects;
-      $scope.objectCount = 0;
-      $scope.objects = [];
-    }
+
+  $scope.switchToSearch = () => {
+    clearSearches();
+    $scope.mode = 'search';
+    moveFocusToFirstVisibleInput();
+    $scope.objectCount = 0;
+    $scope.objects = [];
   };
 
   manageSvc.getSearches().then(res => {
@@ -246,10 +265,8 @@ myModule.controller('ManageCtrl', [
   $scope.addObject = () => {
     let album = getObjectFromForm();
     manageSvc.addObject(album).then(
-      () => {
-        $scope.clearForm();
-        updateTable(); // so new album is in sorted order
-      },
+      //() => $scope.switchToSearch(),
+      $scope.switchToSearch,
       handleError);
   };
 
@@ -260,7 +277,8 @@ myModule.controller('ManageCtrl', [
 
   $scope.clearForm = () => {
     $scope.editObj = null;
-    $scope.fields.forEach(field => field.value = null);
+    let fields = $scope.fields;
+    if (fields) fields.forEach(field => field.value = null);
   };
 
   $scope.deleteObject = (event, index) => {
@@ -295,7 +313,6 @@ myModule.controller('ManageCtrl', [
   };
 
   $scope.filter = (event, field) => {
-    console.log('manage.js filter: entered');
     //TODO: Why does this get called initially with no event?
     if (!event) return;
 
@@ -362,24 +379,14 @@ myModule.controller('ManageCtrl', [
 
   $scope.notImplemented = () => handleError('Not implemented yet');
 
-  $scope.search = (fields) => {
+  $scope.search = fields => {
     // Copy search criteria into filters.
     clearFilters();
     let filters = $scope.filters;
-    fields.forEach(field => {
-      filters[field.property] = field.value;
-    });
+    fields.forEach(field => filters[field.property] = field.value);
 
-    // Copy relevant properties from scope, except autoFilters.
-    let config = {
-      sortField: $scope.sortField,
-      reverse: $scope.reverse,
-      filters: filters,
-      startIndex: $scope.startIndex,
-      pageSize: $scope.pageSize
-    };
-
-    manageSvc.getObjects(config).then(
+    $scope.startIndex = 0;
+    manageSvc.getObjects($scope).then(
       res => processResponse(res),
       res => handleError(res.data));
   };
@@ -391,6 +398,12 @@ myModule.controller('ManageCtrl', [
     $scope.reverse = field === $scope.sortField && !$scope.reverse;
     $scope.sortField = field;
     updateTable();
+  };
+
+  $scope.switchToCreate = () => {
+    $scope.clearForm();
+    $scope.mode = 'create';
+    moveFocusToFirstVisibleInput();
   };
 
   $scope.tableHeadToggle = (open) => {

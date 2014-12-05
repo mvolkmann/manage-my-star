@@ -2,6 +2,7 @@
 @border-color: white;
 @border-width: 2px;
 @cell-width: 200px;
+@hover-color: #eee;
 @inactive-color: #868281;
 @label-width: 70px;
 @table-width: 600px; // 100%;
@@ -56,7 +57,7 @@
   }
 
   .actions {
-    min-width: 240px; //95px;
+    min-width: 400px; //240px; //95px;
     text-align: center;
 
     button {
@@ -133,6 +134,10 @@
   .nav-tabs {
     li > a {
       background-color: @inactive-color;
+      color: black;
+    }
+    li > a:hover {
+      background-color: @hover-color;
       color: black;
     }
     .active > a {

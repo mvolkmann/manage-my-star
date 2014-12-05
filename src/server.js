@@ -67,24 +67,28 @@ function extractObject(req, prefix) {
 function getFieldMap() {
   var map = {};
 
-  function addField({property, type, label, readOnly, options}) {
-    if (!label) label = propertyToLabel(property);
-    if (!readOnly) readOnly = false;
+  function addField(obj) {
+    var property = obj.property;
 
-    map[property] = {property, type, label, readOnly, options};
+    if (!obj.label) obj.label = propertyToLabel(property);
+    if (!obj.readOnly) obj.readOnly = false;
 
-    if (type === 'boolean') map[property].value = false;
+    map[property] = obj;
+
+    if (obj.type === 'boolean') map[property].value = false;
   }
 
   addField({
     property: 'artist',
     type: 'string',
+    required: true,
     readOnly: true
   });
 
   addField({
     property: 'title',
-    type: 'string'
+    type: 'string',
+    required: true
   });
 
   addField({

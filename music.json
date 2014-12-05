@@ -68,13 +68,5 @@
     "rating": 3,
     "own": true,
     "id": 12
-  },
-  "13": {
-    "artist": "sdf",
-    "title": "asdfasd",
-    "genre": "Classical",
-    "rating": 3,
-    "own": null,
-    "id": 13
   }
 }
