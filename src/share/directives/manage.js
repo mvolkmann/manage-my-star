@@ -470,7 +470,6 @@ myModule.directive('manageMyStar', () => {
         [];
       scope.showForm = scope.canAdd || scope.canUpdate;
       scope.actionCount = scope.canDelete ? 1 : 0;
-      console.log('manage.js link: scope.manageActions =', scope.manageActions);
     }
   };
 });

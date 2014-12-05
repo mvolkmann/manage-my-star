@@ -174,22 +174,22 @@
 
             <button class="btn btn-default"
               ng-if="activeTab === 'manage'"
-              ng-repeat="obj in manageActions"
-              title="{{obj.title}}"
-              ng-click="obj.action()">
-              <span ng-if="obj.glyph"
-                class="glyphicon glyphicon-{{obj.glyph}}"></span>
-              <span ng-if="obj.name">{{obj.name}}</span>
+              ng-repeat="ma in manageActions"
+              title="{{ma.title}}"
+              ng-click="ma.action(obj)">
+              <span ng-if="ma.glyph"
+                class="glyphicon glyphicon-{{ma.glyph}}"></span>
+              <span ng-if="ma.name">{{ma.name}}</span>
             </button>
 
             <button class="btn btn-default"
               ng-if="activeTab === 'search'"
-              ng-repeat="obj in searchActions"
-              title="{{obj.title}}"
-              ng-click="obj.action()">
-              <span ng-if="obj.glyph"
-                class="glyphicon glyphicon-{{obj.glyph}}"></span>
-              <span ng-if="obj.name">{{obj.name}}</span>
+              ng-repeat="sa in searchActions"
+              title="{{sa.title}}"
+              ng-click="sa.action(obj)">
+              <span ng-if="sa.glyph"
+                class="glyphicon glyphicon-{{sa.glyph}}"></span>
+              <span ng-if="sa.name">{{sa.name}}</span>
             </button>
           </td>
         </tr>

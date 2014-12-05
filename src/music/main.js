@@ -20,8 +20,8 @@ music.controller('MusicCtrl', ['$scope', $scope => {
     {
       glyph: 'tree-conifer',
       title: 'Christmas Tree',
-      action() {
-        alert('Merry Christmas!');
+      action(album) {
+        alert('Merry Christmas ' + album.artist + '!');
       }
     }
   ];
