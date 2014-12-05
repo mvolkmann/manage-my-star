@@ -134,7 +134,10 @@
     li > a {
       background-color: @inactive-color;
       border-color: @inactive-color;
+      //border-top: solid @active-color 5px; // same color across top of all tabs
+      //border-radius: 0; // square tabs
       color: black;
+      //margin-right: 0; // no space between tabs
     }
     .active > a, .active > a:hover {
       background-color: @active-color;
