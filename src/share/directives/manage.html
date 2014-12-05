@@ -1,26 +1,25 @@
 <div class="manage-my-star">
   <h3 class="heading">{{header}}</h3>
 
-  <div ng-show="mode !== 'create'">
-    <tabset>
+  <tabset>
+    <tab heading="{{manageHeading}}" select="switchToManage()">
+      <form ng-if="showForm" name="manageForm">
+        <ng-include src="'src/share/directives/manage-form.html'"></ng-include>
+      </form>
 
-      <tab heading="{{manageHeading}}" select="switchToManage()">
-        <form ng-if="showForm" name="manageForm">
-          <ng-include src="'src/share/directives/manage-form.html'"></ng-include>
-        </form>
+      <div ng-if="showForm" class="row">
+        <label></label>
+        <button ng-if="canUpdate" class="btn btn-default"
+          ng-click="updateObject()"
+          ng-disabled="!editObj || manageForm.$invalid">
+          Update
+        </button>
+        <span>Click in a table row to edit it using the fields above.</span>
+      </div>
+    </tab>
 
-        <div ng-if="showForm" class="row">
-          <label></label>
-          <button ng-if="canUpdate" class="btn btn-default"
-            ng-click="updateObject()"
-            ng-disabled="!editObj || manageForm.$invalid">
-            Update
-          </button>
-          <span>Click in a table row to edit it using the fields above.</span>
-        </div>
-      </tab>
-
-      <tab heading="{{searchHeading}}" select="switchToSearch()">
+    <tab heading="{{searchHeading}}" select="switchToSearch()">
+      <div ng-show="mode === 'search'">
         <div class="searches">
           <div ng-repeat="fields in searches" class="form-group"
             ng-show="showSearch($index)">
@@ -50,9 +49,28 @@
           ng-click="switchToCreate()">
           Create
         </button>
-      </tab>
-    </tabset>
+      </div>
 
+      <div ng-show="mode === 'create'">
+        <h3>Create a new {{resource}}.</h3>
+        <form name="createForm">
+          <ng-include src="'src/share/directives/manage-form.html'"></ng-include>
+        </form>
+        <div>
+          <button class="btn btn-default"
+            ng-disabled="createForm.$invalid"
+            ng-click="addObject()">
+            Create {{resource}}
+          </button>
+          <button class="btn btn-default" ng-click="mode = 'search'">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </tab>
+  </tabset>
+
+  <div ng-show="mode !== 'create'">
     <hr ng-show="objectCount">
 
     <!-- Don't display anything until the fields
@@ -179,23 +197,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
-  </div>
-
-  <div ng-show="mode === 'create'">
-    <h3>Create a new {{resource}}.</h3>
-    <form name="createForm">
-      <ng-include src="'src/share/directives/manage-form.html'"></ng-include>
-    </form>
-    <div>
-      <button class="btn btn-default"
-        ng-disabled="createForm.$invalid"
-        ng-click="addObject()">
-        Create {{resource}}
-      </button>
-      <button class="btn btn-default" ng-click="mode = 'search'">
-        Cancel
-      </button>
     </div>
   </div>
 </div>

@@ -2,7 +2,6 @@
 @border-color: white;
 @border-width: 2px;
 @cell-width: 200px;
-@hover-color: #eee;
 @inactive-color: #868281;
 @label-width: 70px;
 @table-width: 600px; // 100%;
@@ -134,14 +133,12 @@
   .nav-tabs {
     li > a {
       background-color: @inactive-color;
+      border-color: @inactive-color;
       color: black;
     }
-    li > a:hover {
-      background-color: @hover-color;
-      color: black;
-    }
-    .active > a {
+    .active > a, .active > a:hover {
       background-color: @active-color;
+      border-color: @active-color;
       color: white;
     }
   }

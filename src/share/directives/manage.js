@@ -292,6 +292,8 @@ myModule.controller('ManageCtrl', [
             () => {
               $scope.clearForm();
               $scope.objects.splice(index, 1);
+              $scope.endIndex--;
+              $scope.objectCount--;
             },
             handleError
           ));
