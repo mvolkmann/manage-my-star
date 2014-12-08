@@ -46,15 +46,17 @@ myModule.factory('manageSvc', ['$http', $http => {
     return s;
   }
 
+  let prefix = '/';
+
   return {
     addObject(obj) {
-      return $http.post('/' + resourceName, obj);
+      return $http.post(prefix + resourceName, obj);
     },
     deleteObject(id) {
-      return $http.delete('/' + resourceName + '/' + id);
+      return $http.delete(prefix + resourceName + '/' + id);
     },
     getFields() {
-      return $http.get('/' + resourceName + '-field');
+      return $http.get(prefix + resourceName + '-field');
     },
     getObjects({mode, sortField, reverse, // using destructuring
       autoFilters, filters,
@@ -62,7 +64,7 @@ myModule.factory('manageSvc', ['$http', $http => {
     }) {
       if (!sortField) return; // premature call
 
-      let url = '/' + resourceName + '?sort=' + sortField.property;
+      let url = prefix + resourceName + '?sort=' + sortField.property;
       if (reverse) url += '&reverse=' + reverse;
       if (pageNum) url += '&pageNum=' + pageNum;
       if (pageSize) url += '&pageSize=' + pageSize;
@@ -72,14 +74,14 @@ myModule.factory('manageSvc', ['$http', $http => {
       return $http.get(url);
     },
     getSearches() {
-      return $http.get('/' + resourceName + '-search');
+      return $http.get(prefix + resourceName + '-search');
     },
     toString(id) {
       let config = {headers: {Accept: 'text/plain'}};
-      return $http.get('/' + resourceName + '/' + id, config);
+      return $http.get(prefix + resourceName + '/' + id, config);
     },
     updateObject(obj) {
-      return $http.put('/' + resourceName + '/' + obj.id, obj);
+      return $http.put(prefix + resourceName + '/' + obj.id, obj);
     }
   };
 }]);
