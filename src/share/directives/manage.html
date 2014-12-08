@@ -40,7 +40,7 @@
               <span id="show-more-btn" class="glyphicon"
                 ng-class="searchAmount === 'more' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up'"
                 ng-click="toggleSearches()">
-              </button>
+              </span>
             </span>
           </div>
         </div>
@@ -71,13 +71,13 @@
   </tabset>
 
   <div ng-show="mode !== 'create'">
-    <hr ng-show="objectCount">
+    <hr ng-show="pageObj.itemCount">
 
     <!-- Don't display anything until the fields
         have been retrieved from the server. -->
     <div ng-if="fields">
-      <div class="pagination" ng-hide="objectCount <= pageSize">
-        Showing {{startIndex + 1}} to {{endIndex}} of {{objectCount}}
+      <div class="pagination" ng-hide="pageObj.itemCount <= pageSize">
+        Showing {{pageObj.startIndex + 1}} to {{pageObj.endIndex}} of {{pageObj.itemCount}}
         <button class="btn btn-default"
           ng-disabled="!hasPreviousPage()"
           ng-click="getFirstPage()">
@@ -102,7 +102,7 @@
         </button>
       </div>
 
-      <table ng-show="objectCount" class="manage-table-head">
+      <table ng-show="pageObj.itemCount" class="manage-table-head">
         <thead>
           <tr ng-class="accordionStates.managing ? 'managing' : 'searching'">
             <th ng-repeat="field in fields" ng-if="!isHidden(field)">
@@ -154,11 +154,11 @@
 
       <table class="manage-table-body">
         <tbody>
-          <tr ng-repeat="obj in objects" ng-click="editObject($index, obj)">
+          <tr ng-repeat="item in pageObj.items" ng-click="editObject($index, item)">
             <td class="manage-type-{{field.type}}"
               ng-repeat="field in fields"
               ng-if="!isHidden(field)">
-              {{getPropValue(obj, field)}}
+              {{getPropValue(item, field)}}
             </td>
 
             <td ng-if="actionCount > 0" class="actions">
@@ -179,7 +179,7 @@
                 ng-if="mode === 'manage'"
                 ng-repeat="ma in manageActions"
                 title="{{ma.title}}"
-                ng-click="ma.action(obj)">
+                ng-click="ma.action(item)">
                 <span ng-if="ma.glyph"
                   class="glyphicon glyphicon-{{ma.glyph}}"></span>
                 <span ng-if="ma.name">{{ma.name}}</span>
@@ -188,7 +188,7 @@
                 ng-if="mode === 'search'"
                 ng-repeat="sa in searchActions"
                 title="{{sa.title}}"
-                ng-click="sa.action(obj)">
+                ng-click="sa.action(item)">
                 <span ng-if="sa.glyph"
                   class="glyphicon glyphicon-{{sa.glyph}}"></span>
                 <span ng-if="sa.name">{{sa.name}}</span>

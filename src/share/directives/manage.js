@@ -58,14 +58,14 @@ myModule.factory('manageSvc', ['$http', $http => {
     },
     getObjects({mode, sortField, reverse, // using destructuring
       autoFilters, filters,
-      startIndex, pageSize
+      pageNum, pageSize
     }) {
       if (!sortField) return; // premature call
 
       let url = '/' + resourceName + '?sort=' + sortField.property;
       if (reverse) url += '&reverse=' + reverse;
-      if (startIndex !== undefined) url += '&start=' + startIndex;
-      if (pageSize) url += '&size=' + pageSize;
+      if (pageNum) url += '&pageNum=' + pageNum;
+      if (pageSize) url += '&pageSize=' + pageSize;
       if (mode !== 'search') url += getFilterQueryParams(autoFilters, 'af');
       url += getFilterQueryParams(filters, 'filter');
       //console.log('manage.js getObjects: url =', url);
@@ -173,6 +173,10 @@ myModule.controller('ManageCtrl', [
       'text';
   }
 
+  function getLastPageNum() {
+    return Math.ceil($scope.pageObj.itemCount / $scope.pageSize);
+  }
+
   function getObjectFromForm() {
     let obj = {};
     $scope.fields.forEach(field => {
@@ -191,17 +195,11 @@ myModule.controller('ManageCtrl', [
   }
 
   function processResponse(res) {
-    // This is the total number of matching objects,
-    // not the number of objects that were returned from the server!
-    $scope.objectCount = Number(res.headers()['x-array-size']);
-
-    $scope.endIndex = Math.min(
-      $scope.startIndex + $scope.pageSize, $scope.objectCount);
-    $scope.objects = res.data;
+    $scope.pageObj = res.data;
 
     if ($scope.canAdd &&
       $scope.mode === 'search' &&
-      $scope.objectCount === 0) {
+      $scope.itemCount === 0) {
       let msg = 'No matches were found.  Would you like to create one?';
       dialogSvc.confirm(msg).then($scope.switchToCreate);
     }
@@ -218,8 +216,7 @@ myModule.controller('ManageCtrl', [
       res => handleError(res.data));
   }
 
-  // This is for paging.
-  $scope.startIndex = 0;
+  $scope.pageNum = 1;
 
   resourceName = $scope.resource;
   $scope.autoFilters = getAutoFilters();
@@ -292,7 +289,6 @@ myModule.controller('ManageCtrl', [
             () => {
               $scope.clearForm();
               $scope.objects.splice(index, 1);
-              $scope.endIndex--;
               $scope.objectCount--;
             },
             handleError
@@ -337,23 +333,22 @@ myModule.controller('ManageCtrl', [
   };
 
   $scope.getFirstPage = () => {
-    $scope.startIndex = 0;
+    $scope.pageNum = 1;
     updateTable();
   };
 
   $scope.getLastPage = () => {
-    var ps = $scope.pageSize;
-    $scope.startIndex = Math.floor(($scope.objectCount - 1) / ps) * ps;
+    $scope.pageNum = getLastPageNum();
     updateTable();
   };
 
   $scope.getNextPage = () => {
-    $scope.startIndex += $scope.pageSize;
+    $scope.pageNum++;
     updateTable();
   };
 
   $scope.getPreviousPage = () => {
-    $scope.startIndex -= $scope.pageSize;
+    $scope.pageNum--;
     updateTable();
   };
 
@@ -364,10 +359,12 @@ myModule.controller('ManageCtrl', [
     return value;
   };
 
-  $scope.hasNextPage = () =>
-    $scope.startIndex + $scope.pageSize < $scope.objectCount;
+  $scope.hasNextPage = () => {
+    let pageObj = $scope.pageObj;
+    return pageObj ? pageObj.pageNum < getLastPageNum() : false;
+  };
 
-  $scope.hasPreviousPage = () => $scope.startIndex > 0;
+  $scope.hasPreviousPage = () => $scope.pageNum > 1;
 
   $scope.isHidden = field => $scope.hiddenProps.includes(field.property);
 
@@ -387,7 +384,7 @@ myModule.controller('ManageCtrl', [
     let filters = $scope.filters;
     fields.forEach(field => filters[field.property] = field.value);
 
-    $scope.startIndex = 0;
+    $scope.pageNum = 1;
     manageSvc.getObjects($scope).then(
       res => processResponse(res),
       res => handleError(res.data));

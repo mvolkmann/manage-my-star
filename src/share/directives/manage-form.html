@@ -1,0 +1,16 @@
+<div class="row" ng-repeat="field in fields">
+  <div class="form-group">
+    <label>{{field.label}}</label>
+    <input ng-if="field.inputType !== 'select'"
+      ng-class="field.type === 'boolean' ? '' : 'form-control'"
+      type="{{field.inputType}}"
+      ng-model="field.value"
+      ng-disabled="isReadOnly(field, editObj)"
+      ng-required="field.required">
+    <select ng-if="field.inputType === 'select'" class="form-control"
+      ng-model="field.value"
+      ng-disabled="isReadOnly(field, editObj)">
+      <option ng-repeat="option in field.options">{{option}}</option>
+    </select>
+  </div>
+</div>

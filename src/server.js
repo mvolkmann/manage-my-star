@@ -165,8 +165,8 @@ app['delete']('/album/:id', (req, res) => {
  */
 app.get('/album', (req, res) => {
   // Get query parameters related to paging.
-  let startIndex = getNumericQueryParam(req, 'start');
-  let pageSize = getNumericQueryParam(req, 'size');
+  let pageNum = getNumericQueryParam(req, 'pageNum');
+  let pageSize = getNumericQueryParam(req, 'pageSize');
 
   // Get query parameters related to sorting.
   let sortProp = req.query.sort;
@@ -193,7 +193,7 @@ app.get('/album', (req, res) => {
     albums = applyFilter(albums, filter);
 
     // This must be done AFTER filtering!
-    let arraySize = albums.length;
+    let itemCount = albums.length;
 
     if (sortProp) {
       // Sort the array of albums.
@@ -209,9 +209,14 @@ app.get('/album', (req, res) => {
       });
     }
 
-    if (startIndex !== undefined) {
+    let startIndex = 0;
+    let endIndex ;
+    if (pageNum !== undefined) {
       // Filter out ones outside the requested "page".
-      let endIndex = pageSize ? startIndex + pageSize : undefined;
+      startIndex = (pageNum - 1) * pageSize;
+      endIndex = pageSize ?
+        Math.min(itemCount, startIndex + pageSize) :
+        itemCount;
       albums = albums.slice(startIndex, endIndex);
     }
 
@@ -219,9 +224,10 @@ app.get('/album', (req, res) => {
     if (albums.length > 0) albums[0]._readOnly = true;
 
     // Return the array of albums.
+    var pageObj = {startIndex, endIndex, pageNum, itemCount, items: albums};
+
     res.set('Content-Type', 'application/json');
-    res.set('x-array-size', arraySize);
-    res.end(JSON.stringify(albums));
+    res.end(JSON.stringify(pageObj));
   });
 });
 
