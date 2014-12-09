@@ -33,12 +33,13 @@ function convertType(value) {
 }
 
 myModule.factory('manageSvc', ['$http', $http => {
+
   function getFilterQueryParams(filters, prefix) {
     let s = '';
     if (filters) {
       Object.keys(filters).forEach(prop => {
         let value = filters[prop];
-        if (value || value === false) {
+        if (value !== null && value !== undefined) {
           s += '&' + prefix + '-' + prop + '=' + value;
         }
       });
